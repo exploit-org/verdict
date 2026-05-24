@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.exploit'
-version = findProperty('releaseVersion') ?: '0.1.0'
+version = findProperty('releaseVersion') ?: '0.1.1'
 
 def centralBundleRepo = layout.buildDirectory.dir('repos/central-bundles')
 def publishableProjects = [
