@@ -1,0 +1,8 @@
+rootProject.name = 'verdict'
+
+include 'verdict-intent-x509'
+include 'verdict-intent-evm'
+include 'verdict-intent-bitcoin'
+include 'verdict-intent-typed'
+include 'verdict-authority'
+include 'verdict-authority-oci'

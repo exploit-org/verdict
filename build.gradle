@@ -1,0 +1,178 @@
+plugins {
+    id 'base'
+    id 'java-library'
+    id 'maven-publish'
+    id 'signing'
+    id 'tech.yanand.maven-central-publish' version '1.2.0'
+}
+
+group = 'org.exploit'
+version = findProperty('releaseVersion') ?: '0.1.0'
+
+def centralBundleRepo = layout.buildDirectory.dir('repos/central-bundles')
+def publishableProjects = [
+        project(':'),
+        project(':verdict-intent-x509'),
+        project(':verdict-intent-evm'),
+        project(':verdict-intent-bitcoin'),
+        project(':verdict-intent-typed'),
+        project(':verdict-authority'),
+        project(':verdict-authority-oci')
+]
+
+def pomDescriptions = [
+        ':':                       'Verdict policy engine core.',
+        ':verdict-intent-x509':    'Verdict intent module for RFC 5280 TBSCertificate pre-issuance checks.',
+        ':verdict-intent-evm':     'Verdict intent module for unsigned EVM transactions and effects.',
+        ':verdict-intent-bitcoin': 'Verdict intent module for unsigned Bitcoin-like UTXO transactions.',
+        ':verdict-intent-typed':   'Verdict intent module for declarative custom JSON typed intents.',
+        ':verdict-authority':      'Verdict authority policy bundle model, parser, compiler, and registry.',
+        ':verdict-authority-oci':  'Verdict authority loader for digest-pinned OCI artifacts.'
+]
+
+def projectUrlValue = findProperty('projectUrl') ?: 'https://github.com/exploit/verdict'
+def scmConnectionValue = findProperty('scmConnection') ?: 'scm:git:https://github.com/exploit/verdict.git'
+def scmDeveloperConnectionValue = findProperty('scmDeveloperConnection') ?: 'scm:git:ssh://git@github.com/exploit/verdict.git'
+def developerIdValue = findProperty('developerId') ?: 'xlloit'
+def developerNameValue = findProperty('developerName') ?: 'xlloyd'
+def developerEmailValue = findProperty('developerEmail') ?: 'contact@exploit.org'
+
+mavenCentral {
+    repoDir = centralBundleRepo
+    authToken = centralMavenToken
+    publishingType = 'USER_MANAGED'
+}
+
+configure(publishableProjects) {
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
+
+    group = rootProject.group
+    version = rootProject.version
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+
+        withSourcesJar()
+        withJavadocJar()
+    }
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:6.0.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    tasks.withType(Test).configureEach {
+        useJUnitPlatform()
+    }
+
+    tasks.withType(Javadoc).configureEach {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId = rootProject.group
+                artifactId = project == rootProject ? rootProject.name : project.name
+
+                from components.java
+
+                pom {
+                    name = project == rootProject ? rootProject.name : project.name
+                    description = pomDescriptions[project.path]
+                    url = projectUrlValue
+
+                    licenses {
+                        license {
+                            name = 'Apache License 2.0'
+                            url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = developerIdValue
+                            name = developerNameValue
+                            email = developerEmailValue
+                        }
+                    }
+
+                    scm {
+                        connection = scmConnectionValue
+                        developerConnection = scmDeveloperConnectionValue
+                        url = projectUrlValue
+                    }
+                }
+            }
+        }
+
+        repositories {
+            maven {
+                name = 'CentralBundle'
+                url = rootProject.layout.buildDirectory.dir('repos/central-bundles')
+            }
+        }
+    }
+
+    signing {
+        if (signingKey) {
+            def decodedSigningKey = new String(Base64.mimeDecoder.decode(signingKey.toString()), "UTF-8")
+
+            if (!decodedSigningKey.startsWith("-----BEGIN PGP PRIVATE KEY BLOCK-----")) {
+                throw new GradleException("signingKey is not base64 of an armored private key")
+            }
+
+            useInMemoryPgpKeys(decodedSigningKey, signingPassword?.toString())
+        }
+
+        required = {
+            gradle.taskGraph.allTasks.any { task ->
+                task.name.toLowerCase(java.util.Locale.ROOT).contains('publish') ||
+                        task.name.toLowerCase(java.util.Locale.ROOT).contains('sign')
+            }
+        }
+
+        sign publishing.publications.maven
+    }
+}
+
+dependencies {
+    implementation 'dev.cel:cel:0.12.0'
+}
+
+tasks.register('publishAllToCentralBundle') {
+    group = 'publishing'
+    description = 'Publishes every publication into build/repos/central-bundles.'
+    dependsOn(publishableProjects.collect {
+        it == rootProject
+                ? ':publishAllPublicationsToCentralBundleRepository'
+                : "${it.path}:publishAllPublicationsToCentralBundleRepository"
+    })
+}
+
+tasks.register('publishAllToMavenCentralPortal') {
+    group = 'publishing'
+    description = 'Uploads the root Maven Central bundle to Maven Central Portal.'
+    dependsOn(tasks.named('publishToMavenCentralPortal'))
+}
+
+tasks.named('zipBundleForUpload') {
+    dependsOn(tasks.named('publishAllToCentralBundle'))
+}
+
+tasks.register('publishAllToMavenLocal') {
+    group = 'publishing'
+    description = 'Publishes every publication to Maven Local.'
+    dependsOn(publishableProjects.collect {
+        it == rootProject ? ':publishToMavenLocal' : "${it.path}:publishToMavenLocal"
+    })
+}
