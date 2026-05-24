@@ -34,15 +34,3 @@ Most-used pages:
 ```bash
 ./gradlew test
 ```
-
-## Release
-
-```bash
-export CENTRAL_MAVEN_TOKEN='<central-portal-token>'
-export SIGNING_KEY="$(gpg --armor --export-secret-keys <KEY_ID>)"
-export SIGNING_PASSWORD='<gpg-passphrase>'
-
-./gradlew clean publishAllToMavenCentralPortal -PreleaseVersion=0.1.0
-```
-
-The Maven Central bundle is uploaded with `publishingType = USER_MANAGED`; release it manually in Maven Central Portal after validation.
