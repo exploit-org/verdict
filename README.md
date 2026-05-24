@@ -19,15 +19,12 @@ Java 21+ policy engine over Google CEL.
 
 Start here: [docs/README.md](docs/README.md).
 
-Most-used pages:
-
 - [Getting started](docs/getting-started.md)
 - [Core policy engine](docs/core-policy-engine.md)
 - [Built-in CEL functions](docs/cel-functions.md)
 - [Intent modules](docs/intents/README.md)
 - [Effect semantics](docs/intents/effects.md)
 - [Authority documents](docs/authority/README.md)
-- [Maven Central publishing](docs/release/maven-central.md)
 
 ## Build
 
