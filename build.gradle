@@ -30,9 +30,9 @@ def pomDescriptions = [
         ':verdict-authority-oci':  'Verdict authority loader for digest-pinned OCI artifacts.'
 ]
 
-def projectUrlValue = findProperty('projectUrl') ?: 'https://github.com/exploit/verdict'
-def scmConnectionValue = findProperty('scmConnection') ?: 'scm:git:https://github.com/exploit/verdict.git'
-def scmDeveloperConnectionValue = findProperty('scmDeveloperConnection') ?: 'scm:git:ssh://git@github.com/exploit/verdict.git'
+def projectUrlValue = findProperty('projectUrl') ?: 'https://github.com/exploit-org/verdict'
+def scmConnectionValue = findProperty('scmConnection') ?: 'scm:git:https://github.com/exploit-org/verdict.git'
+def scmDeveloperConnectionValue = findProperty('scmDeveloperConnection') ?: 'scm:git:ssh://git@github.com/exploit-org/verdict.git'
 def developerIdValue = findProperty('developerId') ?: 'xlloit'
 def developerNameValue = findProperty('developerName') ?: 'xlloyd'
 def developerEmailValue = findProperty('developerEmail') ?: 'contact@exploit.org'
