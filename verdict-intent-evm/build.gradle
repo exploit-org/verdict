@@ -1,7 +1,7 @@
 dependencies {
     api project(':')
 
-    implementation 'org.web3j:rlp:5.0.2'
-    implementation 'org.web3j:crypto:5.0.2'
-    implementation 'org.web3j:abi:5.0.2'
+    api 'org.web3j:rlp:5.0.2'
+    api 'org.web3j:crypto:5.0.2'
+    api 'org.web3j:abi:5.0.2'
 }
