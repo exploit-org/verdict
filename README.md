@@ -26,7 +26,7 @@ Start here: [docs/README.md](docs/README.md).
 - [Effect semantics](docs/intents/effects.md)
 - [Authority documents](docs/authority/README.md)
 
-## Build
+## Running tests
 
 ```bash
 ./gradlew test
