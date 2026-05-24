@@ -1,0 +1,5 @@
+dependencies {
+    api project(':verdict-authority')
+
+    implementation 'land.oras:oras-java-sdk:0.6.0'
+}
