@@ -7,7 +7,61 @@ plugins {
 }
 
 group = 'org.exploit'
-version = findProperty('releaseVersion') ?: '0.1.1'
+version = findProperty('releaseVersion') ?: '0.1.2'
+
+def centralMavenToken = findProperty('centralMavenToken')
+def signingKey = findProperty('signingKey')
+def signingPassword = findProperty('signingPassword')
+
+def firstPropertyOrEnv = { List<String> propertyNames, List<String> envNames ->
+    for (def propertyName : propertyNames) {
+        def value = findProperty(propertyName)
+        if (value != null && !value.toString().isBlank())
+            return value.toString()
+    }
+
+    for (def envName : envNames) {
+        def value = System.getenv(envName)
+        if (value != null && !value.isBlank())
+            return value
+    }
+
+    return null
+}
+
+def splitBasicAuthToken = { token ->
+    if (token == null || token.toString().isBlank())
+        return null
+
+    def value = token.toString()
+    if (!value.contains(':')) {
+        try {
+            value = new String(Base64.decoder.decode(value), java.nio.charset.StandardCharsets.UTF_8)
+        } catch (IllegalArgumentException ignored) {
+            return null
+        }
+    }
+
+    def separator = value.indexOf(':')
+    if (separator <= 0 || separator == value.length() - 1)
+        return null
+
+    return [value.substring(0, separator), value.substring(separator + 1)]
+}
+
+def centralMavenBasicCredentials = splitBasicAuthToken(centralMavenToken)
+def snapshotRepositoryUrl = firstPropertyOrEnv(
+        ['snapshotRepositoryUrl', 'mavenCentralSnapshotRepositoryUrl'],
+        ['SNAPSHOT_REPOSITORY_URL', 'MAVEN_CENTRAL_SNAPSHOT_REPOSITORY_URL']
+) ?: 'https://central.sonatype.com/repository/maven-snapshots/'
+def snapshotRepositoryUsername = firstPropertyOrEnv(
+        ['snapshotRepositoryUsername', 'mavenCentralUsername', 'centralMavenUsername', 'centralUsername', 'sonatypeUsername'],
+        ['SNAPSHOT_REPOSITORY_USERNAME', 'MAVEN_CENTRAL_USERNAME', 'CENTRAL_MAVEN_USERNAME', 'CENTRAL_USERNAME', 'SONATYPE_USERNAME']
+) ?: centralMavenBasicCredentials?.get(0)
+def snapshotRepositoryPassword = firstPropertyOrEnv(
+        ['snapshotRepositoryPassword', 'mavenCentralPassword', 'centralMavenPassword', 'centralPassword', 'sonatypePassword'],
+        ['SNAPSHOT_REPOSITORY_PASSWORD', 'MAVEN_CENTRAL_PASSWORD', 'CENTRAL_MAVEN_PASSWORD', 'CENTRAL_PASSWORD', 'SONATYPE_PASSWORD']
+) ?: centralMavenBasicCredentials?.get(1)
 
 def centralBundleRepo = layout.buildDirectory.dir('repos/central-bundles')
 def publishableProjects = [
@@ -37,10 +91,43 @@ def developerIdValue = findProperty('developerId') ?: 'xlloit'
 def developerNameValue = findProperty('developerName') ?: 'xlloyd'
 def developerEmailValue = findProperty('developerEmail') ?: 'contact@exploit.org'
 
+def configureMavenCentralSnapshotRepository = { repository ->
+    repository.name = 'MavenCentralSnapshots'
+    repository.url = rootProject.uri(snapshotRepositoryUrl)
+    repository.mavenContent {
+        snapshotsOnly()
+    }
+
+    if (snapshotRepositoryUsername && snapshotRepositoryPassword) {
+        repository.credentials {
+            username = snapshotRepositoryUsername.toString()
+            password = snapshotRepositoryPassword.toString()
+        }
+    }
+}
+
 mavenCentral {
     repoDir = centralBundleRepo
     authToken = centralMavenToken
     publishingType = 'USER_MANAGED'
+}
+
+tasks.register('validateMavenCentralSnapshotPublication') {
+    group = 'publishing'
+    description = 'Validates Maven Central snapshot publishing configuration.'
+
+    doLast {
+        if (!version.toString().endsWith('-SNAPSHOT')) {
+            throw new GradleException("Snapshot publication requires -PreleaseVersion=<version>-SNAPSHOT; current version is ${version}.")
+        }
+
+        if (!snapshotRepositoryUsername || !snapshotRepositoryPassword) {
+            throw new GradleException(
+                    'Missing Maven Central snapshot credentials. Set snapshotRepositoryUsername/snapshotRepositoryPassword ' +
+                            'or compatible Maven Central/Sonatype username/password properties or environment variables.'
+            )
+        }
+    }
 }
 
 configure(publishableProjects) {
@@ -120,7 +207,15 @@ configure(publishableProjects) {
                 name = 'CentralBundle'
                 url = rootProject.layout.buildDirectory.dir('repos/central-bundles')
             }
+            maven(configureMavenCentralSnapshotRepository)
         }
+    }
+
+    tasks.matching {
+        it.name == 'publishAllPublicationsToMavenCentralSnapshotsRepository' ||
+                it.name == 'publishMavenPublicationToMavenCentralSnapshotsRepository'
+    }.configureEach {
+        dependsOn rootProject.tasks.named('validateMavenCentralSnapshotPublication')
     }
 
     signing {
@@ -146,7 +241,7 @@ configure(publishableProjects) {
 }
 
 dependencies {
-    implementation 'dev.cel:cel:0.12.0'
+    api 'dev.cel:cel:0.12.0'
 }
 
 tasks.register('publishAllToCentralBundle') {
@@ -163,6 +258,22 @@ tasks.register('publishAllToMavenCentralPortal') {
     group = 'publishing'
     description = 'Uploads the root Maven Central bundle to Maven Central Portal.'
     dependsOn(tasks.named('publishToMavenCentralPortal'))
+}
+
+tasks.register('publishAllToMavenCentralSnapshots') {
+    group = 'publishing'
+    description = 'Publishes every Verdict -SNAPSHOT publication to Maven Central Portal snapshots.'
+    dependsOn(publishableProjects.collect {
+        it == rootProject
+                ? ':publishAllPublicationsToMavenCentralSnapshotsRepository'
+                : "${it.path}:publishAllPublicationsToMavenCentralSnapshotsRepository"
+    })
+}
+
+tasks.register('publishAllToSnapshotRepository') {
+    group = 'publishing'
+    description = 'Alias for publishAllToMavenCentralSnapshots.'
+    dependsOn(tasks.named('publishAllToMavenCentralSnapshots'))
 }
 
 tasks.named('zipBundleForUpload') {
