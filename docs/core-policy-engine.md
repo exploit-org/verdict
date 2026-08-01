@@ -126,9 +126,8 @@ Intent modules:
 
 ## Compile With Explicit Types
 
-By default, discovered variables are declared as CEL `dyn`.
-
-Use explicit types when you want compile-time validation:
+By default, CEL root variables are discovered and declared as `dyn`. Supplied types refine matching
+roots without making the declaration set strict:
 
 ```java
 CompiledPolicy compiled = evaluator.compile(policy, Map.of(
@@ -136,6 +135,19 @@ CompiledPolicy compiled = evaluator.compile(policy, Map.of(
     "user", MapType.create(SimpleType.STRING, SimpleType.DYN)
 ));
 ```
+
+Use strict compilation when the type map is an authoritative schema:
+
+```java
+CompiledPolicy compiled = evaluator.compileStrict(policy, Map.of(
+    "age", SimpleType.INT,
+    "user", MapType.create(SimpleType.STRING, SimpleType.DYN)
+));
+```
+
+Every external root referenced in strict mode must be present in the schema. `policy.variables` are
+declared automatically, and names may not collide with external declarations. `compileStrict(policy)`
+therefore accepts only policies that do not depend on external variables.
 
 ## Custom Functions
 
