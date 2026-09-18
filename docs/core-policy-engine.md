@@ -199,7 +199,7 @@ PolicyEvaluator evaluator = PolicyEvaluator.builder()
         List.of(SimpleType.DYN, SimpleType.INT, SimpleType.INT),
         List.of(String.class, Long.class, Long.class),
         args -> {
-            int length = ((String) args[0]).length();
+            var length = ((String) args[0]).length();
             return length >= (Long) args[1] && length <= (Long) args[2];
         }
     ))

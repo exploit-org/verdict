@@ -73,3 +73,7 @@ TypedIntent intent = TypedIntent.fromJson(payload, config);
 ## Effects
 
 String values starting with `$` are resolved as paths. Use `$$value` for a literal string beginning with `$`.
+
+## Input validation
+
+JSON must contain one object without duplicate keys or trailing documents. Effect fields cannot override the reserved `type` field. Paths must resolve exactly, without empty components. Defaults and effect literals are copied when configuration is created; later mutation of caller-owned collections or byte arrays does not change the configuration. A null default requires a nullable field.

@@ -10,7 +10,7 @@ implementation 'org.exploit:verdict-intent-evm:0.1.0'
 implementation 'org.exploit:verdict-authority:0.1.0'
 ```
 
-Verdict requires Java 21+.
+Verdict requires Java 25+.
 
 ## Evaluate A Map
 

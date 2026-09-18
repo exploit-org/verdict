@@ -29,7 +29,7 @@ Verdict evaluates policy over typed signing and issuance contexts.
 | CEL helpers | [cel-functions.md](cel-functions.md) |
 | X.509 TBSCertificate | [intents/x509.md](intents/x509.md) |
 | EVM transactions | [intents/evm.md](intents/evm.md) |
-| Bitcoin-like transactions | [intents/bitcoin.md](intents/bitcoin.md) |
+| Bitcoin transactions | [intents/bitcoin.md](intents/bitcoin.md) |
 | Typed JSON intents | [intents/typed.md](intents/typed.md) |
 | Effect semantics | [intents/effects.md](intents/effects.md) |
 | Authority documents | [authority/README.md](authority/README.md) |
@@ -37,6 +37,6 @@ Verdict evaluates policy over typed signing and issuance contexts.
 
 ## Runtime Baseline
 
-- Java 21+
+- Java 25+
 - Gradle wrapper from the repository
 - Google CEL through `dev.cel:cel`

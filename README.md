@@ -1,7 +1,7 @@
 ![](assets/verdict-banner.png)
 # Verdict
 
-Java 21+ policy engine over Google CEL.
+Java 25+ policy engine over Google CEL.
 
 ## Modules
 
@@ -10,7 +10,7 @@ Java 21+ policy engine over Google CEL.
 | `org.exploit:verdict` | Core policy model, builder, compiler, evaluator, and CEL functions. |
 | `org.exploit:verdict-intent-x509` | RFC 5280 `TBSCertificate` intent for pre-issuance checks. |
 | `org.exploit:verdict-intent-evm` | Unsigned EVM transaction intent with ABI/effect mapping. |
-| `org.exploit:verdict-intent-bitcoin` | Unsigned Bitcoin-like UTXO transaction intent. |
+| `org.exploit:verdict-intent-bitcoin` | Unsigned Bitcoin UTXO transaction intent. |
 | `org.exploit:verdict-intent-typed` | Declarative JSON typed intent for custom request shapes. |
 | `org.exploit:verdict-authority` | Authority document parser, loader, compiler, and registry. |
 | `org.exploit:verdict-authority-oci` | Digest-pinned OCI authority loading. |

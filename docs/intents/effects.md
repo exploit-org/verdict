@@ -59,7 +59,7 @@ Typed intents only produce effects declared in config.
 | Module | Effects |
 | --- | --- |
 | EVM | `native.transfer`, `erc20.transfer`, `erc20.approval`, `erc20.transferFrom`, custom mapped effects |
-| Bitcoin-like | `utxo.spend`, `utxo.output`, `utxo.data`, `utxo.fee` |
+| Bitcoin | `utxo.spend`, `utxo.output`, `utxo.data`, `utxo.fee` |
 | Typed JSON | configured effect types |
 
 See also [Built-in CEL functions](../cel-functions.md#effect-helpers).

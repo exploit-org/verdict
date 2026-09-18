@@ -10,7 +10,7 @@ Unknown or partially described consequences are rejected before policy evaluatio
 | --- | --- | --- | --- |
 | X.509 TBSCertificate | `x509.tbs-certificate` | `verdict-intent-x509` | [x509.md](x509.md) |
 | EVM transaction | `evm.transaction` | `verdict-intent-evm` | [evm.md](evm.md) |
-| Bitcoin-like transaction | `bitcoin.transaction` | `verdict-intent-bitcoin` | [bitcoin.md](bitcoin.md) |
+| Bitcoin transaction | `bitcoin.transaction` | `verdict-intent-bitcoin` | [bitcoin.md](bitcoin.md) |
 | Typed JSON | `custom` | `verdict-intent-typed` | [typed.md](typed.md) |
 
 Shared effect rules: [effects.md](effects.md).
