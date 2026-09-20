@@ -1,0 +1,22 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.x509.server
+type: x509.tbs-certificate
+version: 1.0.0
+config: {}
+policy:
+  id: server-name-and-validity
+  fallback: DENY
+  variables:
+    allowedDnsNames: [api.example.com]
+  allow:
+    - id: named-server
+      where:
+        - "version == 3"
+        - "!extensions.basicConstraints.cA"
+        - "extensions.extKeyUsage.serverAuth"
+        - "extensions.subjectAltName.present"
+        - "lists.nonEmpty(extensions.subjectAltName.dnsNames)"
+        - "lists.hasOnly(extensions.subjectAltName.dnsNames, allowedDnsNames)"
+        - "lists.isEmpty(extensions.subjectAltName.ipAddresses)"
+        - "time.before(validity.notBefore, validity.notAfter)"
+        - "time.durationSeconds(validity.notBefore, validity.notAfter) <= 7776000"

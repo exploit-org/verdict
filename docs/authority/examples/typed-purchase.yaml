@@ -1,0 +1,27 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.office.purchase
+type: custom
+version: 1.0.0
+config:
+  fields:
+    recipient: {type: string}
+    currency: {type: string}
+    amount: {type: decimal}
+    urgent: {type: bool, required: false, default: false}
+policy:
+  id: office-purchase
+  fallback: DENY
+  variables:
+    officeRecipient: office-shop
+    maxAmount: "100.00"
+  allow:
+    - id: approved-purchase
+      where:
+        - "recipient == officeRecipient"
+        - "currency == 'USD'"
+        - "decimal.gt(amount, '0')"
+        - "decimal.lte(amount, maxAmount)"
+  deny:
+    - id: urgent-needs-another-process
+      where:
+        - "urgent"

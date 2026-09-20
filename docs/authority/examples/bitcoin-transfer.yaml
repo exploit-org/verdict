@@ -1,0 +1,25 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.bitcoin.transfer
+type: bitcoin.transaction
+version: 1.0.0
+config:
+  network: MAINNET
+policy:
+  id: bitcoin-payment-with-change
+  fallback: DENY
+  variables:
+    # Example addresses. Replace both with addresses you control or intend to pay.
+    recipientAddress: "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
+    changeAddress: "1KFHE7w8BhaENAswwryaoccDb6qcT6DbYY"
+    recipientSatoshis: "100000"
+    maxFeeSatoshis: "1000"
+  allow:
+    - id: approved-payment
+      where:
+        - "network == 'MAINNET'"
+        - "signing.single && sighash.all && !sighash.anyoneCanPay"
+        - "effect.onlyTypes(effects, ['utxo.spend', 'utxo.output', 'utxo.fee'])"
+        - "size(outputs) >= 1 && size(outputs) <= 2"
+        - "outputs.filter(o, o.address == recipientAddress).size() == 1"
+        - "outputs.all(o, (o.address == recipientAddress && bigint.eq(o.amount, recipientSatoshis)) || o.address == changeAddress)"
+        - "bigint.lte(fee, maxFeeSatoshis)"

@@ -1,35 +1,50 @@
-# Intent Modules
+# Choose an intent module
 
-Intent modules decode domain requests into root CEL variables and normalized `effects`.
+An intent module turns an actual request into the fields a policy reads. For example,
+the EVM module decodes serialized transaction bytes into `chainId`, `call` and
+`effects`. Policies read those decoded fields.
 
-Unknown or partially described consequences are rejected before policy evaluation.
-
-## Modules
-
-| Intent | Type | Artifact | Docs |
+| Your actual input | Use | Authority `type` | Guide |
 | --- | --- | --- | --- |
-| X.509 TBSCertificate | `x509.tbs-certificate` | `verdict-intent-x509` | [x509.md](x509.md) |
-| EVM transaction | `evm.transaction` | `verdict-intent-evm` | [evm.md](evm.md) |
-| Bitcoin transaction | `bitcoin.transaction` | `verdict-intent-bitcoin` | [bitcoin.md](bitcoin.md) |
-| Typed JSON | `custom` | `verdict-intent-typed` | [typed.md](typed.md) |
+| Unsigned EVM transaction bytes | `verdict-intent-evm` | `evm.transaction` | [Token transfer](evm.md) |
+| Unsigned Bitcoin transaction + full previous transactions | `verdict-intent-bitcoin` | `bitcoin.transaction` | [Payment and change](bitcoin.md) |
+| DER TBSCertificate body | `verdict-intent-x509` | `x509.tbs-certificate` | [Certificate policy](x509.md) |
+| Your own JSON schema | `verdict-intent-typed` | `custom` | [Typed JSON](typed.md) |
+| Complete AP2 mandate content | `verdict-ap2` | `ap2.mandate` | [Payment policy](payments.md), [adapter](ap2.md) |
+| Complete Mastercard VI mandate content | `verdict-mcintent` | `mcintent.mandate` | [Payment policy](payments.md), [adapter](mcintent.md) |
 
-Shared effect rules: [effects.md](effects.md).
+Artifacts use group `org.exploit`. Use the same version as your Verdict core.
 
-## Design Rules
+## What becomes available to CEL?
 
-- Intent data is flattened into root variables for CEL ergonomics.
-- `transaction`, `call`, `inputs`, `outputs`, and similar aliases remain available where useful.
-- `effects` is the primary surface for consequences.
-- Config comes from trusted authority config, not user payload.
-- Unknown contracts, functions, scripts, or effects fail closed.
+Each guide lists its exact root fields. There is no universal `amount`, `recipient`
+or `config` variable. For example:
 
-## Base64 Inputs
+- EVM: `effect.amount(effects, 'erc20.transfer')` is integer token base units.
+- Bitcoin: `fee` is integer satoshis; `outputs` contains all outputs.
+- Typed JSON: declared field names become roots, with the configured types.
+- X.509: use `extensions`, `validity` and other certificate fields; no generic effects list.
+- Payment requests: `payment` and `checkout` describe the current action;
+  `request` describes the whole request. Verdict checks every action automatically.
 
-TKeeper-style payloads are Base64-first where raw bytes are expected:
+Use [effect helpers](effects.md) where the module supplies effects. Use the
+[readable payment helpers](payments.md) for AP2/VI action policies.
 
-- `EvmTransactionIntent.fromBase64(...)`
-- `BitcoinSigningIntent.unsignedTransactionBase64(...)`
-- `BitcoinSigningIntent.previousTransactionBase64(...)`
-- `TbsCertificateIntent.fromDerBase64(...)`
+## Application flow
 
-Hex methods remain available for debugging and integrations.
+```text
+authority.config + original request
+        → matching intent module
+        → evaluator.evaluate(compiledPolicy, intent)
+        → ALLOW / DENY / ALLOW_WITH_REQUIREMENTS
+        → application's approval and signing logic
+```
+
+A module can reject malformed or unsupported content before evaluation. Its guide
+explains which cases are supported. Typed JSON ignores undeclared fields, so its
+schema must describe every input field relevant to the action being authorized.
+
+Byte-based modules support Base64 for transport:
+`EvmTransactionIntent.fromBase64`, `BitcoinSigningIntent`'s Base64 builder methods,
+and `TbsCertificateIntent.fromDerBase64`. Payment readers take decoded JSON;
+the caller handles JWTs and cryptography.

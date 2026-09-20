@@ -1,0 +1,25 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.evm.transfer
+type: evm.transaction
+version: 1.0.0
+config:
+  chainId: 1
+  contracts:
+    - standard: erc20
+      address: "0x1111111111111111111111111111111111111111"
+policy:
+  id: one-token-transfer
+  fallback: DENY
+  variables:
+    tokenAddress: "0x1111111111111111111111111111111111111111"
+    recipientAddress: "0x2222222222222222222222222222222222222222"
+    maxBaseUnits: "1000000"
+  allow:
+    - id: approved-transfer
+      where:
+        - "chainId == 1"
+        - "effect.onlyTypes(effects, ['erc20.transfer'])"
+        - "effect.one(effects, 'erc20.transfer')"
+        - "effect.all(effects, 'erc20.transfer', {'token': tokenAddress, 'to': recipientAddress})"
+        - "bigint.gt(effect.amount(effects, 'erc20.transfer'), '0')"
+        - "bigint.lte(effect.amount(effects, 'erc20.transfer'), maxBaseUnits)"

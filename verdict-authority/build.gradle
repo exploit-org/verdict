@@ -3,4 +3,9 @@ dependencies {
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+
+    testImplementation project(':verdict-intent-typed')
+    testImplementation project(':verdict-payments')
 }
+
+sourceSets.test.resources.srcDir rootProject.file('docs/authority/examples')

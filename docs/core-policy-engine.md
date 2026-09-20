@@ -1,241 +1,159 @@
-# Core Policy Engine
+# Core engine: integrate a policy evaluator
 
-Artifact: `org.exploit:verdict`.
+Artifact: `org.exploit:verdict`. Java 25+.
 
-## Responsibility
+If you are writing YAML, start with [your first policy](getting-started.md).
+This page explains the Java calls your application makes and their exact behavior.
 
-The core module builds, compiles, and evaluates policies over Google CEL.
-
-It does not decode domain objects by itself. Domain-specific modules convert a request into root CEL variables, then the core evaluator applies policy rules.
-
-## What It Can Check
-
-- Any CEL-compatible Java `Map<String, ?>` context.
-- Any `Intent` implementation.
-- Allow/deny rules with deterministic precedence.
-- Policy-level constants through variables.
-- Built-in helper functions for decimal, bigint, lists, network, semver, crypto, time, and effects.
-- Custom CEL functions registered by the caller.
-
-## Semantics
-
-- Policy id must be non-blank.
-- Rule ids must be unique across `allow` and `deny`.
-- A rule matches when every `where` expression is `true`.
-- A rule does not match when any `unless` expression is `true`.
-- Empty `where` and empty `unless` matches unconditionally.
-- Policy variables are available as root CEL variables.
-- On name collision, policy variables override runtime context variables.
-- `DENY` matches override `ALLOW` matches.
-- If no rule matches, `policy.fallback()` is returned.
-- Result `matches()` includes matched deny rules first, then allow rules.
-
-## Builder API
+## The three calls you need
 
 ```java
-Policy policy = Policy.allowByDefault("policy-id")
-    .allowWhen("public-read", "resource.public")
-    .allow("owner", rule -> rule
-        .where("subject.id == resource.ownerId")
-        .where("action == 'read'")
-        .unless("resource.locked"))
-    .deny("banned", rule -> rule.where("subject.banned"))
-    .build();
+var evaluator = new PolicyEvaluator();                 // application lifetime
+var compiled = evaluator.compileStrict(policy, schema); // once per policy revision
+var result = evaluator.evaluate(compiled, intent);      // once per request
 ```
 
-Raw records are supported:
+`policy` comes from a builder or `authority.policy()`. `schema` declares external
+root variable names and CEL types. `intent` is built by the matching domain module
+with trusted `authority.config()`. No signing takes place in these calls.
+
+| Result | Application behavior |
+| --- | --- |
+| ALLOW | May proceed with the evaluated action |
+| DENY | Stop |
+| ALLOW_WITH_REQUIREMENTS | Satisfy every returned approval requirement before proceeding |
+| Exception | Stop and handle the invalid policy/input/evaluation |
+
+Handle all three verdicts explicitly. See [approvals](approvals.md) for a complete example.
+
+## A complete map example
+
+For application-defined data you can evaluate a Java map directly:
 
 ```java
-Policy policy = new Policy(
-    "policy-id",
-    Verdict.DENY,
-    List.of(new Rule("allow-admin", List.of("subject.role == 'admin'"), List.of())),
-    List.of()
-);
-```
-
-## Policy Variables
-
-Policy variables are constants stored on the policy and merged into CEL root variables at evaluation time.
-
-```java
-Policy policy = Policy.denyByDefault("access")
-    .variable("allowedRoles", List.of("admin", "support"))
-    .variable("maxAmount", "100.00")
-    .allowWhen("role", "subject.role in allowedRoles")
-    .allowWhen("amount", "decimal.lte(request.amount, maxAmount)")
-    .build();
-```
-
-Rules:
-
-- Variable names must be non-blank.
-- Values may be any CEL-compatible Java value.
-- `null` values are visible in CEL as `null`.
-- Policy variables override runtime context variables with the same name.
-
-## Evaluation Context
-
-Pass context as `Map<String, ?>`.
-
-```java
-Map<String, ?> context = Map.of(
-    "subject", Map.of(
-        "id", "u-1",
-        "account", Map.of(
-            "plan", "pro",
-            "scopes", List.of("admin", "team:core")
-        )
-    ),
-    "resource", Map.of(
-        "ownerId", "u-1",
-        "metadata", Map.of("region", "eu-west-1")
-    ),
-    "action", "read"
-);
-```
-
-Nested map access:
-
-```cel
-subject.account.plan == 'pro'
-resource['metadata']['region'] == 'eu-west-1'
-'plan' in subject.account
-```
-
-Missing variables or missing nested keys fail evaluation unless guarded:
-
-```cel
-'plan' in subject.account && subject.account.plan == 'pro'
-```
-
-## Intents
-
-An intent is a typed context adapter. `Intent.variables()` returns root CEL variables.
-
-```java
-PolicyEvaluation result = evaluator.evaluate(policy, intent);
-```
-
-Intent modules:
-
-- [X.509 TBSCertificate intent](intents/x509.md)
-- [EVM transaction intent](intents/evm.md)
-- [Bitcoin transaction intent](intents/bitcoin.md)
-- [Typed JSON intent](intents/typed.md)
-
-## Compile With Explicit Types
-
-By default, CEL root variables are discovered and declared as `dyn`. Supplied types refine matching
-roots without making the declaration set strict:
-
-```java
-CompiledPolicy compiled = evaluator.compile(policy, Map.of(
-    "age", SimpleType.INT,
-    "user", MapType.create(SimpleType.STRING, SimpleType.DYN)
-));
-```
-
-Use strict compilation when the type map is an authoritative schema:
-
-```java
-CompiledPolicy compiled = evaluator.compileStrict(policy, Map.of(
-    "age", SimpleType.INT,
-    "user", MapType.create(SimpleType.STRING, SimpleType.DYN)
-));
-```
-
-Every external root referenced in strict mode must be present in the schema. `policy.variables` are
-declared automatically, and names may not collide with external declarations. `compileStrict(policy)`
-therefore accepts only policies that do not depend on external variables.
-
-## Custom Functions
-
-Register custom CEL functions through `PolicyEvaluator.builder()`.
-
-```java
+import java.util.Map;
 import dev.cel.common.types.SimpleType;
-import org.exploit.verdict.cel.VerdictFunction;
+import org.exploit.verdict.PolicyEvaluator;
+import org.exploit.verdict.model.Policy;
+
+var policy = Policy.denyByDefault("read-access")
+        .allow("active-admin", rule -> rule
+                .where("role == 'admin'")
+                .unless("suspended"))
+        .build();
+var evaluator = new PolicyEvaluator();
+var compiled = evaluator.compileStrict(policy, Map.of(
+        "role", SimpleType.STRING,
+        "suspended", SimpleType.BOOL));
+var result = evaluator.evaluate(compiled, Map.of("role", "admin", "suspended", false));
+// ALLOW; matches contains active-admin.
 ```
 
-Unary:
+Change `suspended` to true or `role` to `viewer`: DENY. Omit a required root from the
+map: evaluation error. The caller supplies every required field.
+For protocol-specific signing formats, use the matching native intent module to
+decode the request.
+
+## How one action is decided
+
+1. A rule matches when every `where` is true and no `unless` is true.
+2. A matching deny rule produces DENY, even when allow rules also match.
+3. Otherwise, matching allow rules permit the action and collect their approvals.
+4. With no matching allow or deny, use `fallback` and its `fallbackApprovals`, if any.
+
+Empty `where`/`unless` lists mean an unconditional match. Rule IDs must be nonempty
+and unique across allow and deny. The policy ID and fallback are required.
+Matching deny rules appear before matching allow rules in `matches()`.
+The evaluator may encounter errors while evaluating other rules even if a deny
+has already matched. Guard optional fields within each rule that reads them.
+
+Separate allow rules use OR. Conditions within one `where` use AND. See
+[AND/OR examples](policy-language.md) before splitting a policy into rules.
+
+## Constants versus input
 
 ```java
-PolicyEvaluator evaluator = PolicyEvaluator.builder()
-    .function(VerdictFunction.unary(
-        "email.isCorporate",
-        SimpleType.BOOL,
-        String.class,
-        email -> email.endsWith("@corp.test")
-    ))
-    .build();
-
-Policy policy = Policy.denyByDefault("custom")
-    .allowWhen("corp-email", "email.isCorporate(subject.email)")
-    .build();
+var policy = Policy.denyByDefault("roles")
+        .variable("allowedRoles", java.util.List.of("admin", "support"))
+        .allowWhen("allowed-role", "role in allowedRoles")
+        .build();
 ```
 
-Binary:
+Policy variables are declared automatically. Names cannot be blank. Null values
+are visible as CEL `null`. With explicit external declarations, collisions with
+policy variable names fail compilation. At runtime, policy variables override
+same-named context entries. Keep constants and request roots distinct.
+
+## compile versus compileStrict
+
+| Call | Behavior |
+| --- | --- |
+| `compile(policy)` | Discovers external roots and declares them as dynamic |
+| `compile(policy, schema)` | Discovers roots and uses supplied types where available |
+| `compileStrict(policy, schema)` | Only roots in the schema and policy constants may be referenced |
+| `compileStrict(policy)` | Only policy constants may be referenced |
+
+Use strict compilation when the intent builder defines the input schema. A dynamic
+map root still has runtime-defined keys: `merchants.officeSop` can compile while
+failing at evaluation because the actual key is `officeShop`. Nested map keys and
+input values are checked during evaluation.
+
+## Intents with one or several actions
+
+An ordinary `Intent` implements `variables()`. Its default `evaluationInputs()`
+returns a list containing that map. Single-action results contain unprefixed rule IDs
+and approval sources.
+
+Payment requests implement the same interface but expose one input map per action.
+`evaluate(compiled, intent)` evaluates every input. Any DENY denies the whole request;
+otherwise every approval requirement survives. An empty input list is invalid.
+An evaluation error aborts the operation.
+For multiple inputs, matched IDs and approval sources carry `action[i]/` prefixes.
+
+Always pass a multi-action intent itself to `evaluate`. `PaymentRequest.variables()`
+throws for multiple actions to prevent accidental evaluation of only one of them.
+Map evaluation represents one action. Multi-action evaluation uses the intent's
+`evaluationInputs()` method.
+
+## Register functions once, then reuse the evaluator
+
+Core helpers are enabled by default. The builder supports custom functions and CEL
+libraries. For [payment helpers](intents/payments.md):
 
 ```java
-PolicyEvaluator evaluator = PolicyEvaluator.builder()
-    .function(VerdictFunction.binary(
-        "network.matches",
-        SimpleType.BOOL,
-        String.class,
-        String.class,
-        (ip, cidr) -> cidr.equals("10.0.0.0/24") && ip.startsWith("10.0.0.")
-    ))
-    .build();
+var payments = new PaymentFunctions();
+var evaluator = PolicyEvaluator.builder()
+        .standardLibraries(true)
+        .library(payments, payments)
+        .build();
 ```
 
-Fixed arity:
+The first library argument installs compiler declarations; the second installs runtime
+implementations. `PaymentFunctions` supplies both. It holds no current authority,
+config or request state, so this evaluator can serve different authorities.
+Compile policies with `compileStrict` and evaluate requests with `evaluate`.
+
+For a small custom predicate:
 
 ```java
-PolicyEvaluator evaluator = PolicyEvaluator.builder()
-    .function(VerdictFunction.fixed(
-        "strings.lengthBetween",
-        SimpleType.BOOL,
-        List.of(SimpleType.DYN, SimpleType.INT, SimpleType.INT),
-        List.of(String.class, Long.class, Long.class),
-        args -> {
-            var length = ((String) args[0]).length();
-            return length >= (Long) args[1] && length <= (Long) args[2];
-        }
-    ))
-    .build();
+var evaluator = PolicyEvaluator.builder()
+        .function(VerdictFunction.unary(
+                "email.isCorporate", SimpleType.BOOL, String.class,
+                email -> email.endsWith("@corp.test")))
+        .build();
+// In CEL: email.isCorporate(subject.email)
 ```
 
-CEL `int` arguments arrive as Java `Long`.
+Import `org.exploit.verdict.cel.VerdictFunction`. Binary and fixed-arity factories
+are also available; CEL `int` arguments arrive as Java `Long`.
+Pass current request data through the evaluation input. Keep shared functions stateless.
 
-## Built-In CEL Functions
+## Diagnose failures
 
-See [Built-in CEL functions](cel-functions.md).
+- `IntentValidationException`: input could not be decoded/validated by its module.
+- `PolicyCompilationException`: invalid policy structure or CEL expression.
+- `PolicyEvaluationException`: a CEL expression could not be evaluated.
 
-## Errors
-
-Compilation errors throw:
-
-```java
-org.exploit.verdict.exception.PolicyCompilationException
-```
-
-Evaluation errors throw:
-
-```java
-org.exploit.verdict.exception.PolicyEvaluationException
-```
-
-Intent validation errors throw:
-
-```java
-org.exploit.verdict.exception.IntentValidationException
-```
-
-Error messages include policy, rule, and expression location.
-
-## Tests
-
-```bash
-./gradlew test
-```
+Configuration and argument factories may also throw `IllegalArgumentException` for
+invalid values. Handle construction errors before proceeding to signing.
+See [troubleshooting](troubleshooting.md) and the [function reference](cel-functions.md).

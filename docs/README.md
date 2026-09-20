@@ -1,42 +1,39 @@
-# Verdict Documentation
+# Write a Verdict policy
 
-Verdict evaluates policy over typed signing and issuance contexts.
+Verdict answers: **may this action be signed or issued?** You describe the rules in
+an authority YAML file. Your application supplies the action and handles signing.
 
-## Read Order
+**Start with [your first policy](getting-started.md).** It includes a complete YAML
+file, a request, and the expected result. No knowledge of CEL or the Java API is assumed.
 
-1. [Getting started](getting-started.md)
-2. [Core policy engine](core-policy-engine.md)
-3. [Built-in CEL functions](cel-functions.md)
-4. [Intent modules](intents/README.md)
-5. [Effect semantics](intents/effects.md)
-6. [Authority documents](authority/README.md)
+## Choose the action you want to control
 
-## Concepts
+| I want to… | Guide | Ready-to-edit authority |
+| --- | --- | --- |
+| Validate my own JSON request | [Typed JSON](intents/typed.md) | [Purchase](authority/examples/typed-purchase.yaml) |
+| Require human approval above a limit | [Approvals](approvals.md) | [Purchase with approval](authority/examples/typed-approvals.yaml) |
+| Control AP2 or Mastercard agent payments | [Payment policies](intents/payments.md) | [AP2](authority/examples/ap2-payment.yaml), [VI](authority/examples/mcintent-payment.yaml) |
+| Restrict an EVM token transfer | [EVM](intents/evm.md) | [Token transfer](authority/examples/evm-transfer.yaml) |
+| Restrict a Bitcoin payment and its change | [Bitcoin](intents/bitcoin.md) | [Payment with change](authority/examples/bitcoin-transfer.yaml) |
+| Check a certificate before issuance | [X.509](intents/x509.md) | [Server certificate](authority/examples/x509-server.yaml) |
 
-| Concept | Meaning |
-| --- | --- |
-| Policy | Allow/deny rules compiled to CEL. |
-| Intent | Typed evaluation context for a request. |
-| Effect | Normalized consequence exposed as a map with `type`. |
-| Authority | Versioned policy bundle with type-specific config. |
-| OCI authority | Digest-pinned authority artifact pulled from an OCI registry. |
+## Learn only what you need
 
-## Module Docs
+- [Policy language](policy-language.md): AND/OR, lists, optional fields, amounts, common mistakes.
+- [Function cookbook and reference](cel-functions.md): pick a helper by the question you need to ask.
+- [Authority fields](authority/README.md): what goes in `config`, `variables`, and rules.
+- [Effects](intents/effects.md): how to check every consequence of a transaction.
+- [Troubleshooting](troubleshooting.md): why a rule did not match, compilation errors, missing fields.
 
-| Module | Docs |
-| --- | --- |
-| Core engine | [core-policy-engine.md](core-policy-engine.md) |
-| CEL helpers | [cel-functions.md](cel-functions.md) |
-| X.509 TBSCertificate | [intents/x509.md](intents/x509.md) |
-| EVM transactions | [intents/evm.md](intents/evm.md) |
-| Bitcoin transactions | [intents/bitcoin.md](intents/bitcoin.md) |
-| Typed JSON intents | [intents/typed.md](intents/typed.md) |
-| Effect semantics | [intents/effects.md](intents/effects.md) |
-| Authority documents | [authority/README.md](authority/README.md) |
-| OCI authority loading | [authority/oci.md](authority/oci.md) |
+## Integrate Verdict into an application
 
-## Runtime Baseline
+[Core Java API](core-policy-engine.md) · [Intent modules](intents/README.md) ·
+[OCI loading](authority/oci.md) · [AP2 adapter](intents/ap2.md) · [VI adapter](intents/mcintent.md).
+Java 25+ is required. Use the same Verdict version for core and intent modules.
 
-- Java 25+
-- Gradle wrapper from the repository
-- Google CEL through `dev.cel:cel`
+An **intent** is the request after the relevant module has decoded it. An **effect**
+is a described consequence, such as a token transfer. An **authority** contains the
+intent configuration and the policy together. The examples show these concepts in use.
+
+Protocol sources: [Google AP2](https://github.com/google-agentic-commerce/AP2) and
+[Mastercard Verifiable Intent](https://github.com/agent-intent/verifiable-intent).

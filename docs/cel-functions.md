@@ -2,6 +2,45 @@
 
 These functions are installed by the core `org.exploit:verdict` module.
 
+AP2 and Mastercard VI provide opt-in [payment receiver functions](intents/payments.md)
+through `verdict-payments`: `payment.payeeIs(...)`, `payment.methodIs(...)`,
+`payment.amountAtMost(...)`, `checkout.merchantIs(...)`, `request.totalAtMost(...)`
+and separate `delegation.*` checks. Register `PaymentFunctions` through `PolicyEvaluator.builder().library(functions, functions)`;
+the ordinary evaluator applies the policy to every action in a payment `Intent`.
+
+## Start from the question
+
+Examples in this table are standalone CEL expressions with their results. In a
+policy, replace literal sample values with the relevant intent field or constant.
+
+| Question | Expression | Result |
+| --- | --- | --- |
+| Is 49.99 within my dollar limit? | `decimal.lte('49.99', '100.00')` | true |
+| Is a satoshi/base-unit amount below a limit? | `bigint.lte('1001', '1000')` | false |
+| Is the list nonempty and restricted? | `lists.nonEmpty(['reader']) && lists.hasOnly(['reader'], ['reader', 'writer'])` | true |
+| Does every list entry satisfy a condition? | `[1, 2].all(n, n > 0)` | true |
+| Is an address inside a subnet? | `cidr.matches('10.1.2.3', '10.0.0.0/8')` | true |
+| Is a version new enough? | `semver.gte('1.5.0', '1.4.0')` | true |
+| Are two UUID strings equivalent? | `crypto.uuidEq('550e8400-e29b-41d4-a716-446655440000', '{550e8400-e29b-41d4-a716-446655440000}')` | true |
+| Does the end follow the start? | `time.before('2026-01-01T00:00:00Z', '2026-02-01T00:00:00Z')` | true |
+
+For transactions, start with [the effects walkthrough](intents/effects.md).
+For AP2/VI, use [the payment walkthrough](intents/payments.md); its helpers include
+currency checks and let you write limits in major units.
+
+### Four details that affect policy outcomes
+
+- `lt` means `<`; `lte` means `<=`. `gt` and `gte` work the same way. `between` is inclusive.
+- Compare list, numeric, digest and timestamp results to form a boolean condition,
+  for example `lists.size(roles) > 0`.
+- An empty list passes `lists.hasOnly` and ordinary CEL `.all`. Add a nonempty check
+  when you require at least one element.
+- Invalid helper arguments can raise evaluation errors. Use the documented input
+  types. Network helpers return false for invalid input.
+
+In the reference below, names such as `roles` and `request.ip` stand for fields
+provided by your intent.
+
 ## Effect Helpers
 
 Inputs: list of maps. Every effect must have `type`.
@@ -98,7 +137,7 @@ bigint.eq(bigint.mod(counter, 10), 9)
 
 ## List Helpers
 
-Inputs: Java `Collection`, Java arrays, and CEL lists. Membership helpers compare numeric Java/CEL values by value, not by wrapper type.
+Inputs: Java `Collection`, Java arrays, and CEL lists. Membership helpers compare numbers by numeric value across Java/CEL types.
 
 ```cel
 lists.containsAny(subject.account.scopes, ['admin', 'billing'])
@@ -163,6 +202,10 @@ semver.between(app.version, '1.4.0', '1.5.0')
 
 ## Crypto Helpers
 
+These functions compute hashes and normalize identifiers. The caller verifies
+signatures and authenticates credentials, including AP2/VI tokens.
+
+
 Byte inputs: `byte[]`, `ByteBuffer`, `UUID`, Java collections, and arrays of byte values. String inputs are UTF-8 unless the function documents normalization.
 
 ```cel
@@ -182,6 +225,11 @@ crypto.uuidEq(request.id, expectedRequestId)
 - `crypto.uuidEq(left, right)`: compares UUID values after normalization; invalid values return `false`.
 
 ## Time Helpers
+
+`time.now()` reads the evaluation machine's current clock. Re-evaluation later can
+change the result. If your integration needs the same decision on several nodes,
+provide the same trusted timestamp in the input and compare against that timestamp.
+
 
 Inputs: `Instant`, `Date`, `Calendar`, `OffsetDateTime`, `ZonedDateTime`, `LocalDateTime` as UTC, `LocalDate` as UTC start of day, ISO/RFC-1123 strings, epoch seconds, and epoch millis.
 

@@ -1,4 +1,95 @@
-# EVM Transaction Intent
+# EVM: allow one token transfer
+
+The module decodes an **unsigned EVM transaction** and its configured ABI call.
+Policies evaluate the transaction fields and the effects defined by the call's mapping.
+
+Goal: on chain 1, transfer at most 1,000,000 base units of one configured token to
+one configured recipient. The policy rejects approvals and other effect types.
+
+## What the policy sees
+
+Relevant fields produced by the decoder:
+
+```json
+{
+  "chainId": 1,
+  "effects": [{
+    "type": "erc20.transfer",
+    "token": "0x1111111111111111111111111111111111111111",
+    "to": "0x2222222222222222222222222222222222222222",
+    "amount": "500000"
+  }]
+}
+```
+
+Here `amount` is displayed as a string for readability; the module supplies a
+`BigInteger`. For a six-decimal token, this represents 0.5 tokens. Set the limit
+using the token's known decimals.
+
+## Complete authority
+
+```yaml
+schemaVersion: verdict.authority/v1
+id: com.acme.evm.transfer
+type: evm.transaction
+version: 1.0.0
+config:
+  chainId: 1
+  contracts:
+    - standard: erc20
+      address: "0x1111111111111111111111111111111111111111"
+policy:
+  id: one-token-transfer
+  fallback: DENY
+  variables:
+    tokenAddress: "0x1111111111111111111111111111111111111111"
+    recipientAddress: "0x2222222222222222222222222222222222222222"
+    maxBaseUnits: "1000000"
+  allow:
+    - id: approved-transfer
+      where:
+        - "chainId == 1"
+        - "effect.onlyTypes(effects, ['erc20.transfer'])"
+        - "effect.one(effects, 'erc20.transfer')"
+        - "effect.all(effects, 'erc20.transfer', {'token': tokenAddress, 'to': recipientAddress})"
+        - "bigint.gt(effect.amount(effects, 'erc20.transfer'), '0')"
+        - "bigint.lte(effect.amount(effects, 'erc20.transfer'), maxBaseUnits)"
+```
+
+Download [evm-transfer.yaml](../authority/examples/evm-transfer.yaml).
+Replace the example token and recipient addresses, then set `maxBaseUnits` in the
+token's smallest units. Use lowercase addresses in policy constants because the
+module exposes lowercase addresses.
+
+## Read the rule
+
+| Check | Reason |
+| --- | --- |
+| `chainId == 1` | Restrict the transaction's chain |
+| `onlyTypes(..., ['erc20.transfer'])` | Reject other described actions, such as approvals |
+| `one(..., 'erc20.transfer')` | Require exactly one transfer |
+| `all(..., {'token': ..., 'to': ...})` | Check its token and recipient |
+| `bigint.gt(..., '0')` | Exclude zero-value transfers |
+| `bigint.lte(..., maxBaseUnits)` | Bound its integer amount |
+
+The ERC-20 config decodes `transfer`, `approve` and `transferFrom`. This policy
+permits only `transfer`. Effect mappings define how decoded calls are represented;
+contract simulation is outside the module.
+
+| Request | Result |
+| --- | --- |
+| Correct recipient, 500,000 units | ALLOW |
+| Correct recipient, 1,000,001 units | DENY |
+| Correct amount, different recipient | DENY |
+| `approve` on the configured token | DENY |
+| Transfer plus an additional described effect | DENY |
+| Unknown contract/function | Input validation error |
+
+This example restricts token movement. Add fee conditions for your fee policy, for
+example `bigint.lte(gasLimit, '100000')` in the same `where`. Fee fields depend on the
+transaction type; guard nullable fields or constrain `type` before using them.
+
+## API, custom contracts and available fields
 
 Artifact: `org.exploit:verdict-intent-evm`.
 
@@ -71,17 +162,6 @@ EvmTransactionIntent intent = EvmTransactionIntent.fromBase64(serializedTransact
 
 Addresses in config use the `0x` prefix and Signet validation (including checksum validation for mixed-case addresses). Exposed addresses are lowercase. Effect paths must resolve to existing fields.
 
-## Policy Example
-
-```cel
-chainId == 1 &&
-effect.one(effects, 'erc20.transfer') &&
-effect.any(effects, 'erc20.transfer', {
-    'token': tokenAddress,
-    'to': recipientAddress
-}) &&
-bigint.lte(effect.amount(effects, 'erc20.transfer'), maxAmount)
-```
 
 ## Rejections
 

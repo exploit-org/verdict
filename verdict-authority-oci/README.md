@@ -1,5 +1,6 @@
 # verdict-authority-oci
 
-Digest-pinned OCI authority loading.
+Load the same authority documents from a digest-pinned OCI artifact.
 
-Canonical docs: [docs/authority/oci.md](../docs/authority/oci.md).
+[OCI setup and troubleshooting](../docs/authority/oci.md) explains references, loading
+and artifact contents. [Authority examples](../docs/authority/README.md) show the files to publish.
