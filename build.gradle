@@ -71,6 +71,7 @@ def publishableProjects = [
         project(':verdict-intent-bitcoin'),
         project(':verdict-intent-typed'),
         project(':verdict-ap2'),
+        project(':verdict-mcintent'),
         project(':verdict-payments'),
         project(':verdict-authority'),
         project(':verdict-authority-oci')
@@ -83,6 +84,7 @@ def pomDescriptions = [
         ':verdict-intent-bitcoin': 'Verdict intent module for unsigned Bitcoin transactions.',
         ':verdict-intent-typed':   'Verdict intent module for declarative custom JSON typed intents.',
         ':verdict-ap2':            'Verdict evaluation of AP2 mandate content.',
+        ':verdict-mcintent':       'Verdict evaluation of Mastercard Verifiable Intent mandate content.',
         ':verdict-payments':       'Shared payment configuration and user-facing CEL policy helpers.',
         ':verdict-authority':      'Verdict authority policy bundle model, parser, compiler, and registry.',
         ':verdict-authority-oci':  'Verdict authority loader for digest-pinned OCI artifacts.'
