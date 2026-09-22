@@ -1,0 +1,7 @@
+dependencies {
+    api project(':')
+
+    api platform('org.exploit.signet:bom:0.1.0')
+    api 'org.exploit.signet:tron'
+    implementation project(':digital-assets:verdict-evm')
+}

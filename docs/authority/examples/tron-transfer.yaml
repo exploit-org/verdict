@@ -1,0 +1,24 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.tron.transfer
+type: tron.transaction
+version: 1.0.0
+config:
+  contracts:
+    - standard: trc20
+      address: "TJngGWiRMLgNFScEybQxLEKQMNdB4nR6Vx"
+policy:
+  id: one-trc20-transfer
+  fallback: DENY
+  variables:
+    tokenAddress: "TJngGWiRMLgNFScEybQxLEKQMNdB4nR6Vx"
+    recipientAddress: "TYD4pB7wGi1p8zK67rBTV3KdfEb9nvNDXh"
+    maxBaseUnits: "1000000"
+  allow:
+    - id: approved-transfer
+      where:
+        - "feeLimit <= 30000000"
+        - "effect.onlyTypes(effects, ['trc20.transfer'])"
+        - "effect.one(effects, 'trc20.transfer')"
+        - "effect.all(effects, 'trc20.transfer', {'token': tokenAddress, 'to': recipientAddress})"
+        - "bigint.gt(effect.amount(effects, 'trc20.transfer'), '0')"
+        - "bigint.lte(effect.amount(effects, 'trc20.transfer'), maxBaseUnits)"
