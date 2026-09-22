@@ -13,12 +13,12 @@ and cryptographic verification remain in the integration.
 A request can contain several actions. **You write the rule for one action; Verdict
 runs it for every action.** If one action is denied, the entire request is denied.
 
-| Action kind | What you are authorizing | Fields to check |
-| --- | --- | --- |
-| `purchase` | A concrete checkout and its payment together | `checkout`, `payment` |
-| `payment` | A concrete payment at a payment-only signing stage | `payment` |
-| `checkout` | A concrete checkout at a checkout-only signing stage | `checkout` |
-| `delegation` | Permission to make future purchases within proposed bounds | `delegation` |
+| Action kind  | What you are authorizing                                   | Fields to check       |
+|--------------|------------------------------------------------------------|-----------------------|
+| `purchase`   | A concrete checkout and its payment together               | `checkout`, `payment` |
+| `payment`    | A concrete payment at a payment-only signing stage         | `payment`             |
+| `checkout`   | A concrete checkout at a checkout-only signing stage       | `checkout`            |
+| `delegation` | Permission to make future purchases within proposed bounds | `delegation`          |
 
 A **checkout** is the order/cart description. A **payment** specifies who receives
 money, the method and the amount. A **delegation** grants future authority: a maximum
@@ -95,16 +95,16 @@ For VI, the authority uses `type: mcintent.mandate`; the policy expressions are 
 
 ## Read each part in plain language
 
-| Part | Meaning |
-| --- | --- |
-| `config.merchants.officeShop` | A name for an exact merchant identity |
-| `config.methods.companyCard` | A name for one specific card/method |
-| `maxPerPurchase: "100.00"` | A policy constant, in major units (USD dollars here) |
-| `action.kind == 'purchase'` | Only approve concrete checkout/payment pairs |
-| `checkout.merchantIs(merchants.officeShop)` | The shop in the checkout must match this configured shop |
-| `payment.payeeIs(merchants.officeShop)` | The recipient of the money must match this configured shop |
-| `payment.methodIs(methods.companyCard)` | Use this particular configured card |
-| `payment.amountAtMost(maxPerPurchase, 'USD')` | Current payment is in USD and no more than USD 100 |
+| Part                                                   | Meaning                                                                   |
+|--------------------------------------------------------|---------------------------------------------------------------------------|
+| `config.merchants.officeShop`                          | A name for an exact merchant identity                                     |
+| `config.methods.companyCard`                           | A name for one specific card/method                                       |
+| `maxPerPurchase: "100.00"`                             | A policy constant, in major units (USD dollars here)                      |
+| `action.kind == 'purchase'`                            | Only approve concrete checkout/payment pairs                              |
+| `checkout.merchantIs(merchants.officeShop)`            | The shop in the checkout must match this configured shop                  |
+| `payment.payeeIs(merchants.officeShop)`                | The recipient of the money must match this configured shop                |
+| `payment.methodIs(methods.companyCard)`                | Use this particular configured card                                       |
+| `payment.amountAtMost(maxPerPurchase, 'USD')`          | Current payment is in USD and no more than USD 100                        |
 | `!request.totalAtMost(maxPerRequest, 'USD')` in `deny` | Deny if the complete request is not priced entirely in USD within USD 150 |
 
 The shop and payee are separate checks because a checkout's seller can differ from
@@ -121,16 +121,16 @@ Accessing a missing catalog key raises an evaluation error.
 
 All purchases below use the configured shop, payee and method unless stated otherwise.
 
-| Request | Decision | Reason |
-| --- | --- | --- |
-| One purchase of USD 100 | ALLOW | Meets both limits |
-| Two purchases of USD 75 | ALLOW | Each <= 100; together <= 150 |
-| Two purchases of USD 80 | DENY | Total 160 |
-| One purchase of USD 100.01 | DENY | Individual limit exceeded |
-| USD 10 plus EUR 10 | DENY | Request is not entirely in USD |
-| One valid purchase plus one using another card | DENY | Every action must pass |
-| One valid purchase plus a delegation | DENY | Delegation is not permitted by this rule |
-| Payment-only action | DENY | Different signing stage; `kind` is not `purchase` |
+| Request                                        | Decision | Reason                                            |
+|------------------------------------------------|----------|---------------------------------------------------|
+| One purchase of USD 100                        | ALLOW    | Meets both limits                                 |
+| Two purchases of USD 75                        | ALLOW    | Each <= 100; together <= 150                      |
+| Two purchases of USD 80                        | DENY     | Total 160                                         |
+| One purchase of USD 100.01                     | DENY     | Individual limit exceeded                         |
+| USD 10 plus EUR 10                             | DENY     | Request is not entirely in USD                    |
+| One valid purchase plus one using another card | DENY     | Every action must pass                            |
+| One valid purchase plus a delegation           | DENY     | Delegation is not permitted by this rule          |
+| Payment-only action                            | DENY     | Different signing stage; `kind` is not `purchase` |
 
 The total check returns false for unpriced actions or mixed currencies.
 It sums payments within the current request. Daily or monthly limits require
@@ -227,13 +227,13 @@ This is a **replacement policy fragment for a delegation-specific authority**. K
 `fallback: DENY` and the identity catalogs. Remove the purchase example's
 `!request.totalAtMost(...)` deny rule: delegations are unpriced and fail that check.
 
-| Function | Question it answers |
-| --- | --- |
-| `merchantsLimitedTo([...])` | Is there an explicit merchant restriction, with every candidate allowed here? |
-| `payeesLimitedTo([...])` | Are all fixed/allowed payment recipients within these definitions? |
-| `methodsLimitedTo([...])` | Are all fixed/allowed payment methods within these definitions? |
-| `maxAmountAtMost('100.00', 'USD')` | Is there an explicit fixed amount or maximum no greater than USD 100? |
-| `hasOnlyConstraints([...])` | Are all constraint types in this list? |
+| Function                           | Question it answers                                                           |
+|------------------------------------|-------------------------------------------------------------------------------|
+| `merchantsLimitedTo([...])`        | Is there an explicit merchant restriction, with every candidate allowed here? |
+| `payeesLimitedTo([...])`           | Are all fixed/allowed payment recipients within these definitions?            |
+| `methodsLimitedTo([...])`          | Are all fixed/allowed payment methods within these definitions?               |
+| `maxAmountAtMost('100.00', 'USD')` | Is there an explicit fixed amount or maximum no greater than USD 100?         |
+| `hasOnlyConstraints([...])`        | Are all constraint types in this list?                                        |
 
 Missing bounds return false. The lists must be nonempty. `hasOnlyConstraints`
 checks the types of constraints present; use bound helpers to require specific limits.
@@ -266,9 +266,10 @@ var result = evaluator.evaluate(policy, request);
 ```
 
 `authority` is a loaded [authority document](../authority/README.md).
-`checkoutMandateJson` and `paymentMandateJson` are complete mandate JSON objects;
-`decodedCheckoutJson` is the decoded checkout content associated with the checkout
-mandate. The adapter establishes that association and handles all cryptography.
+`checkoutMandateJson`, `paymentMandateJson`, and `decodedCheckoutJson` are Jackson
+`JsonNode` objects. Pass the trees from your application's JSON decoder directly.
+`decodedCheckoutJson` contains the checkout associated with the checkout mandate.
+The adapter establishes that association and handles all cryptography.
 For Mastercard VI, use `McIntent.request` from
 `org.exploit.verdict.intent.mcintent` with the same input and config types.
 
@@ -289,6 +290,34 @@ var request = Ap2Intent.request(
 Import `org.exploit.verdict.intent.payment.constant.PaymentRequestMode`.
 `CHECKOUTS` similarly accepts closed checkout mandates only. Standalone open mandates
 are not supported by these modes.
+
+`MandateInput` also works with Jackson deserialization. For example, a payment input
+for `PAYMENTS` mode has this JSON representation:
+
+```json
+{
+  "json": {
+    "vct": "mandate.payment.1",
+    "transaction_id": "order-1",
+    "payee": {"id": "merchant-1", "name": "Office shop", "website": "https://office.example"},
+    "payment_instrument": {"id": "card-1", "type": "card"},
+    "payment_amount": {"currency": "USD", "amount": 7500}
+  },
+  "checkoutJson": null,
+  "disclosureHash": null
+}
+```
+
+Use `mapper.treeToValue(inputNode, MandateInput.class)` to construct the input.
+For a closed checkout mandate, `checkoutJson` contains the decoded checkout object.
+Both JSON fields are copied on construction and access, so changes to a caller's
+tree do not change retained inputs or the evaluated request.
+
+Enable `StreamReadFeature.STRICT_DUPLICATE_DETECTION` and
+`DeserializationFeature.FAIL_ON_TRAILING_TOKENS` on the application's JSON decoder.
+Enable `DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS` to preserve decimal values.
+Duplicate keys and numeric precision already lost during decoding cannot be recovered
+from a `JsonNode`.
 
 Reuse the evaluator across authorities and compile once per authority revision.
 Pass trusted additional data through `request.withContext(context)`; it is exposed

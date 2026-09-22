@@ -5,7 +5,8 @@ These functions are installed by the core `org.exploit:verdict` module.
 AP2 and Mastercard VI provide opt-in [payment receiver functions](intents/payments.md)
 through `verdict-payments`: `payment.payeeIs(...)`, `payment.methodIs(...)`,
 `payment.amountAtMost(...)`, `checkout.merchantIs(...)`, `request.totalAtMost(...)`
-and separate `delegation.*` checks. Register `PaymentFunctions` through `PolicyEvaluator.builder().library(functions, functions)`;
+and separate `delegation.*` checks. Register `PaymentFunctions` through
+`PolicyEvaluator.builder().library(functions, functions)`;
 the ordinary evaluator applies the policy to every action in a payment `Intent`.
 
 ## Start from the question
@@ -13,16 +14,16 @@ the ordinary evaluator applies the policy to every action in a payment `Intent`.
 Examples in this table are standalone CEL expressions with their results. In a
 policy, replace literal sample values with the relevant intent field or constant.
 
-| Question | Expression | Result |
-| --- | --- | --- |
-| Is 49.99 within my dollar limit? | `decimal.lte('49.99', '100.00')` | true |
-| Is a satoshi/base-unit amount below a limit? | `bigint.lte('1001', '1000')` | false |
-| Is the list nonempty and restricted? | `lists.nonEmpty(['reader']) && lists.hasOnly(['reader'], ['reader', 'writer'])` | true |
-| Does every list entry satisfy a condition? | `[1, 2].all(n, n > 0)` | true |
-| Is an address inside a subnet? | `cidr.matches('10.1.2.3', '10.0.0.0/8')` | true |
-| Is a version new enough? | `semver.gte('1.5.0', '1.4.0')` | true |
-| Are two UUID strings equivalent? | `crypto.uuidEq('550e8400-e29b-41d4-a716-446655440000', '{550e8400-e29b-41d4-a716-446655440000}')` | true |
-| Does the end follow the start? | `time.before('2026-01-01T00:00:00Z', '2026-02-01T00:00:00Z')` | true |
+| Question                                     | Expression                                                                                        | Result |
+|----------------------------------------------|---------------------------------------------------------------------------------------------------|--------|
+| Is 49.99 within my dollar limit?             | `decimal.lte('49.99', '100.00')`                                                                  | true   |
+| Is a satoshi/base-unit amount below a limit? | `bigint.lte('1001', '1000')`                                                                      | false  |
+| Is the list nonempty and restricted?         | `lists.nonEmpty(['reader']) && lists.hasOnly(['reader'], ['reader', 'writer'])`                   | true   |
+| Does every list entry satisfy a condition?   | `[1, 2].all(n, n > 0)`                                                                            | true   |
+| Is an address inside a subnet?               | `cidr.matches('10.1.2.3', '10.0.0.0/8')`                                                          | true   |
+| Is a version new enough?                     | `semver.gte('1.5.0', '1.4.0')`                                                                    | true   |
+| Are two UUID strings equivalent?             | `crypto.uuidEq('550e8400-e29b-41d4-a716-446655440000', '{550e8400-e29b-41d4-a716-446655440000}')` | true   |
+| Does the end follow the start?               | `time.before('2026-01-01T00:00:00Z', '2026-02-01T00:00:00Z')`                                     | true   |
 
 For transactions, start with [the effects walkthrough](intents/effects.md).
 For AP2/VI, use [the payment walkthrough](intents/payments.md); its helpers include
@@ -137,7 +138,8 @@ bigint.eq(bigint.mod(counter, 10), 9)
 
 ## List Helpers
 
-Inputs: Java `Collection`, Java arrays, and CEL lists. Membership helpers compare numbers by numeric value across Java/CEL types.
+Inputs: Java `Collection`, Java arrays, and CEL lists. Membership helpers compare numbers by numeric value across
+Java/CEL types.
 
 ```cel
 lists.containsAny(subject.account.scopes, ['admin', 'billing'])
@@ -173,16 +175,19 @@ cidr.matchesAny(request.ip, allowedCidrs)
 - `ip.isV4(value)`: `true` for IPv4.
 - `ip.isV6(value)`: `true` for IPv6.
 - `ip.isPrivate(value)`: `true` for RFC1918 IPv4 and unique-local IPv6.
-- `ip.isPublic(value)`: `true` for public addresses; false for invalid, private, loopback, link-local, reserved, multicast, and documentation ranges.
+- `ip.isPublic(value)`: `true` for public addresses; false for invalid, private, loopback, link-local, reserved,
+  multicast, and documentation ranges.
 - `ip.isLoopback(value)`: `true` for loopback addresses.
 - `ip.isLinkLocal(value)`: `true` for IPv4 `169.254.0.0/16` and IPv6 `fe80::/10`.
 - `cidr.matches(ip, cidr)`: `true` when `ip` is inside `cidr`; invalid inputs return `false`.
-- `cidr.matchesAny(ip, cidrs)`: `true` when `ip` is inside any CIDR. `cidrs` may be a collection, array, single CIDR string, or comma-separated string.
+- `cidr.matchesAny(ip, cidrs)`: `true` when `ip` is inside any CIDR. `cidrs` may be a collection, array, single CIDR
+  string, or comma-separated string.
 - `cidr.contains(cidr, ipOrCidr)`: `true` when the first CIDR contains an IP or another CIDR.
 
 ## Semver Helpers
 
-Supports SemVer precedence, prerelease ordering, build metadata ignore, optional `v` prefix, and missing minor/patch as `0`.
+Supports SemVer precedence, prerelease ordering, build metadata ignore, optional `v` prefix, and missing minor/patch as
+`0`.
 
 ```cel
 semver.gte(app.version, '1.4.0')
@@ -205,8 +210,8 @@ semver.between(app.version, '1.4.0', '1.5.0')
 These functions compute hashes and normalize identifiers. The caller verifies
 signatures and authenticates credentials, including AP2/VI tokens.
 
-
-Byte inputs: `byte[]`, `ByteBuffer`, `UUID`, Java collections, and arrays of byte values. String inputs are UTF-8 unless the function documents normalization.
+Byte inputs: `byte[]`, `ByteBuffer`, `UUID`, Java collections, and arrays of byte values. String inputs are UTF-8 unless
+the function documents normalization.
 
 ```cel
 crypto.sha256(subject.email) == expectedHash
@@ -218,7 +223,8 @@ crypto.uuidEq(request.id, expectedRequestId)
 - `crypto.sha256(value)`: SHA-256 hex digest.
 - `crypto.sha512(value)`: SHA-512 hex digest.
 - `crypto.md5(value)`: MD5 hex digest.
-- `crypto.hex(value)`: hex-encodes bytes. If a string is already valid hex with spaces, colons, dashes, or `0x`, returns normalized lowercase hex.
+- `crypto.hex(value)`: hex-encodes bytes. If a string is already valid hex with spaces, colons, dashes, or `0x`, returns
+  normalized lowercase hex.
 - `crypto.isHex(value)`: `true` when a string is valid even-length hex after normalization.
 - `crypto.uuid(value)`: canonical lowercase UUID string; accepts `UUID`, UUID strings, `{uuid}`, and `urn:uuid:...`.
 - `crypto.isUuid(value)`: `true` when `value` can be parsed as UUID.
@@ -230,8 +236,8 @@ crypto.uuidEq(request.id, expectedRequestId)
 change the result. If your integration needs the same decision on several nodes,
 provide the same trusted timestamp in the input and compare against that timestamp.
 
-
-Inputs: `Instant`, `Date`, `Calendar`, `OffsetDateTime`, `ZonedDateTime`, `LocalDateTime` as UTC, `LocalDate` as UTC start of day, ISO/RFC-1123 strings, epoch seconds, and epoch millis.
+Inputs: `Instant`, `Date`, `Calendar`, `OffsetDateTime`, `ZonedDateTime`, `LocalDateTime` as UTC, `LocalDate` as UTC
+start of day, ISO/RFC-1123 strings, epoch seconds, and epoch millis.
 
 ```cel
 time.after(time.now(), subject.createdAt)

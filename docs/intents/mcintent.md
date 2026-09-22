@@ -7,7 +7,8 @@ Artifact: `org.exploit:verdict-mcintent`
 
 Intent type: `mcintent.mandate` (`IntentTypes.MCINTENT_MANDATE`)
 
-`McIntent` implements `Intent` for the [pinned Verifiable Intent v0.1 draft](https://github.com/agent-intent/verifiable-intent/tree/356c29635f1c44df7de02edb58699ca9f29bece6).
+`McIntent` implements `Intent` for
+the [pinned Verifiable Intent v0.1 draft](https://github.com/agent-intent/verifiable-intent/tree/356c29635f1c44df7de02edb58699ca9f29bece6).
 It evaluates a proposed mandate before signing, or mandate content extracted by an
 external credential processor, through `PolicyEvaluator`.
 
@@ -20,12 +21,12 @@ are rejected recursively, including inside extension data.
 
 The supported exact `vct` values and effects are:
 
-| `vct` | Effect |
-| --- | --- |
-| `mandate.payment.1` | `mcintent.payment.authorize` |
-| `mandate.checkout.1` | `mcintent.checkout.authorize` |
-| `mandate.payment.open.1` | `mcintent.payment.delegate` |
-| `mandate.checkout.open.1` | `mcintent.checkout.delegate` |
+| `vct`                     | Effect                        |
+|---------------------------|-------------------------------|
+| `mandate.payment.1`       | `mcintent.payment.authorize`  |
+| `mandate.checkout.1`      | `mcintent.checkout.authorize` |
+| `mandate.payment.open.1`  | `mcintent.payment.delegate`   |
+| `mandate.checkout.open.1` | `mcintent.checkout.delegate`  |
 
 Closed content can originate in Immediate L2 or Autonomous L3; the caller identifies
 and verifies its signing layer. Open content describes a grant of future authority.
@@ -76,7 +77,7 @@ var policy = Policy.denyByDefault("mc-payment")
 var evaluation = new PolicyEvaluator().evaluate(policy, intent);
 ```
 
-`fromJson` accepts `String` and UTF-8 `byte[]`. Monetary amounts and budget bounds
+`fromJson` accepts Jackson `JsonNode`, `String`, and UTF-8 `byte[]`. Monetary amounts and budget bounds
 require integer JSON numbers in ISO-4217 minor units. The reader exposes them as
 `BigInteger`; compare them with `bigint.*` functions.
 
@@ -86,9 +87,12 @@ require integer JSON numbers in ISO-4217 minor units. The reader exposes them as
 var intent = McIntent.fromCheckoutJson(mandateContentJson, decodedCheckoutJson);
 ```
 
-Both arguments accept `String` or UTF-8 `byte[]`. The caller supplies the complete
+Both arguments accept Jackson `JsonNode`, `String`, or UTF-8 `byte[]`. The caller supplies the complete
 decoded content belonging to the mandate's `checkout_jwt` and verifies their binding.
 The checkout must be a nonempty JSON object.
+
+The text and byte readers reject duplicate keys and trailing content. For `JsonNode`
+input, configure the application's decoder as shown in [Java integration](payments.md#java-integration).
 
 VI v0.1 leaves the checkout schema to the integration. The reader exposes it unchanged
 under `checkout`, both at the root and inside the effect. Write conditions using your
@@ -107,11 +111,11 @@ integer JSON values are `BigInteger` and decimal extension data is `BigDecimal`.
 
 A payment authorization effect additionally contains:
 
-| Field | Value |
-| --- | --- |
-| `amount` | `payment_amount.amount` |
-| `asset` | `payment_amount.currency` |
-| `to` | Complete `payee` object, including `name`, `website` and optional `id` |
+| Field    | Value                                                                  |
+|----------|------------------------------------------------------------------------|
+| `amount` | `payment_amount.amount`                                                |
+| `asset`  | `payment_amount.currency`                                              |
+| `to`     | Complete `payee` object, including `name`, `website` and optional `id` |
 
 The effect preserves the full recipient because VI makes the opaque payee ID optional.
 Delegation effects expose `constraints`, `cnf` and the other mandate fields without

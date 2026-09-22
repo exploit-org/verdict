@@ -69,15 +69,15 @@ your signing integration has verified belongs to the intended wallet.
 configured address. The size bound permits one or two outputs. Together they stop
 an extra output to an attacker.
 
-| Request | Result |
-| --- | --- |
-| 100,000 to recipient, change to configured address, fee 1,000 | ALLOW |
-| 100,000 to recipient, no change, fee 900 | ALLOW |
-| Correct payment plus output to another address | DENY |
-| Recipient gets 100,001 | DENY |
-| Fee 1,001 | DENY |
-| OP_RETURN data output | DENY under this policy |
-| Missing previous transaction | Input validation error |
+| Request                                                       | Result                 |
+|---------------------------------------------------------------|------------------------|
+| 100,000 to recipient, change to configured address, fee 1,000 | ALLOW                  |
+| 100,000 to recipient, no change, fee 900                      | ALLOW                  |
+| Correct payment plus output to another address                | DENY                   |
+| Recipient gets 100,001                                        | DENY                   |
+| Fee 1,001                                                     | DENY                   |
+| OP_RETURN data output                                         | DENY under this policy |
+| Missing previous transaction                                  | Input validation error |
 
 The policy checks the complete transaction even when `signing.single` selects one
 input to sign. Add `inputs`/`prevout` conditions to restrict which wallet's inputs can
@@ -153,7 +153,6 @@ BitcoinSigningIntent intent = BitcoinSigningIntent.builder()
 - `previousTransactions`
 - `totalInput`, `totalOutput`, `fee`
 - `effects`
-
 
 ## Rejections
 

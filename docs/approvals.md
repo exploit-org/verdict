@@ -41,13 +41,13 @@ policy:
         approvers: [manager]
 ```
 
-| Input to office-shop | Result |
-| --- | --- |
-| USD 30.00 | ALLOW |
-| USD 30.01 | ALLOW_WITH_REQUIREMENTS: manager must approve |
-| USD 100.00 | ALLOW_WITH_REQUIREMENTS |
-| USD 100.01 | DENY |
-| EUR 20.00 or another recipient | DENY |
+| Input to office-shop           | Result                                        |
+|--------------------------------|-----------------------------------------------|
+| USD 30.00                      | ALLOW                                         |
+| USD 30.01                      | ALLOW_WITH_REQUIREMENTS: manager must approve |
+| USD 100.00                     | ALLOW_WITH_REQUIREMENTS                       |
+| USD 100.01                     | DENY                                          |
+| EUR 20.00 or another recipient | DENY                                          |
 
 `threshold: 1` means one of the listed approvers. For two of three, define three
 named approvers under `policy.approvers`, list those names in the rule and set
@@ -56,12 +56,12 @@ public key with your real approver's key.
 
 ## What the signing integration does
 
-| Verdict | Next action |
-| --- | --- |
-| ALLOW | Signing may proceed for the evaluated content |
-| DENY | Stop; no signature |
+| Verdict                 | Next action                                              |
+|-------------------------|----------------------------------------------------------|
+| ALLOW                   | Signing may proceed for the evaluated content            |
+| DENY                    | Stop; no signature                                       |
 | ALLOW_WITH_REQUIREMENTS | Obtain and verify every required approval before signing |
-| Exception | Stop; fix or reject the invalid input/policy |
+| Exception               | Stop; fix or reject the invalid input/policy             |
 
 Each returned requirement includes the policy ID, source rule, threshold and eligible
 approvers. The application collects and verifies their approvals, then signs the action.

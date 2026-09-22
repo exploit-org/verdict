@@ -63,27 +63,27 @@ module exposes lowercase addresses.
 
 ## Read the rule
 
-| Check | Reason |
-| --- | --- |
-| `chainId == 1` | Restrict the transaction's chain |
-| `onlyTypes(..., ['erc20.transfer'])` | Reject other described actions, such as approvals |
-| `one(..., 'erc20.transfer')` | Require exactly one transfer |
-| `all(..., {'token': ..., 'to': ...})` | Check its token and recipient |
-| `bigint.gt(..., '0')` | Exclude zero-value transfers |
-| `bigint.lte(..., maxBaseUnits)` | Bound its integer amount |
+| Check                                 | Reason                                            |
+|---------------------------------------|---------------------------------------------------|
+| `chainId == 1`                        | Restrict the transaction's chain                  |
+| `onlyTypes(..., ['erc20.transfer'])`  | Reject other described actions, such as approvals |
+| `one(..., 'erc20.transfer')`          | Require exactly one transfer                      |
+| `all(..., {'token': ..., 'to': ...})` | Check its token and recipient                     |
+| `bigint.gt(..., '0')`                 | Exclude zero-value transfers                      |
+| `bigint.lte(..., maxBaseUnits)`       | Bound its integer amount                          |
 
 The ERC-20 config decodes `transfer`, `approve` and `transferFrom`. This policy
 permits only `transfer`. Effect mappings define how decoded calls are represented;
 contract simulation is outside the module.
 
-| Request | Result |
-| --- | --- |
-| Correct recipient, 500,000 units | ALLOW |
-| Correct recipient, 1,000,001 units | DENY |
-| Correct amount, different recipient | DENY |
-| `approve` on the configured token | DENY |
-| Transfer plus an additional described effect | DENY |
-| Unknown contract/function | Input validation error |
+| Request                                      | Result                 |
+|----------------------------------------------|------------------------|
+| Correct recipient, 500,000 units             | ALLOW                  |
+| Correct recipient, 1,000,001 units           | DENY                   |
+| Correct amount, different recipient          | DENY                   |
+| `approve` on the configured token            | DENY                   |
+| Transfer plus an additional described effect | DENY                   |
+| Unknown contract/function                    | Input validation error |
 
 This example restricts token movement. Add fee conditions for your fee policy, for
 example `bigint.lte(gasLimit, '100000')` in the same `where`. Fee fields depend on the
@@ -97,9 +97,11 @@ Intent type: `evm.transaction`.
 
 ## Purpose
 
-`EvmTransactionIntent` decodes unsigned serialized EVM transactions and exposes transaction fields, decoded calls, and effects.
+`EvmTransactionIntent` decodes unsigned serialized EVM transactions and exposes transaction fields, decoded calls, and
+effects.
 
-Parsing uses Signet and requires Java 25. Supported transaction types are legacy (0), EIP-2930 (1), and EIP-1559 (2). Signed transactions and types 3/4 are rejected. ABI calls use the ABI codec available through Signet.
+Parsing uses Signet and requires Java 25. Supported transaction types are legacy (0), EIP-2930 (1), and EIP-1559 (2).
+Signed transactions and types 3/4 are rejected. ABI calls use the ABI codec available through Signet.
 
 Contract calls are whitelist-only. The target contract, function selector, and effect mapping must be configured.
 
@@ -133,7 +135,9 @@ config:
                 amount: "$amount"
 ```
 
-`chainId` may come from the transaction or trusted config. An encoded chain ID must match the configured value and fit a positive signed 64-bit integer. Legacy transactions without an encoded chain ID use the configured value, or `null` when absent.
+`chainId` may come from the transaction or trusted config. An encoded chain ID must match the configured value and fit a
+positive signed 64-bit integer. Legacy transactions without an encoded chain ID use the configured value, or `null` when
+absent.
 
 ## Java
 
@@ -158,10 +162,11 @@ EvmTransactionIntent intent = EvmTransactionIntent.fromBase64(serializedTransact
 - `call`
 - `effects`
 
-`type` is the numeric type encoded as a string: `"0"`, `"1"`, or `"2"`. `gasPrice` is `null` for type 2; dynamic fee fields are `null` for types 0/1.
+`type` is the numeric type encoded as a string: `"0"`, `"1"`, or `"2"`. `gasPrice` is `null` for type 2; dynamic fee
+fields are `null` for types 0/1.
 
-Addresses in config use the `0x` prefix and Signet validation (including checksum validation for mixed-case addresses). Exposed addresses are lowercase. Effect paths must resolve to existing fields.
-
+Addresses in config use the `0x` prefix and Signet validation (including checksum validation for mixed-case addresses).
+Exposed addresses are lowercase. Effect paths must resolve to existing fields.
 
 ## Rejections
 

@@ -181,17 +181,17 @@ TypedIntent intent = TypedIntent.fromJson(payload, config);
 
 ## Types
 
-| Type | Java value |
-| --- | --- |
-| `string` | `String` |
-| `bool` | `Boolean` |
-| `int` | `Long` |
-| `bigint` | `BigInteger` |
-| `decimal` | `BigDecimal` |
-| `time` | `Instant` |
-| `bytes` | `byte[]` from Base64 |
-| `object` | nested map |
-| `list` | list |
+| Type      | Java value           |
+|-----------|----------------------|
+| `string`  | `String`             |
+| `bool`    | `Boolean`            |
+| `int`     | `Long`               |
+| `bigint`  | `BigInteger`         |
+| `decimal` | `BigDecimal`         |
+| `time`    | `Instant`            |
+| `bytes`   | `byte[]` from Base64 |
+| `object`  | nested map           |
+| `list`    | list                 |
 
 ## Effects
 
@@ -199,4 +199,7 @@ String values starting with `$` are resolved as paths. Use `$$value` for a liter
 
 ## Input validation
 
-JSON must contain one object without duplicate keys or trailing documents. Effect fields cannot override the reserved `type` field. Paths must resolve exactly, without empty components. Defaults and effect literals are copied when configuration is created; later mutation of caller-owned collections or byte arrays does not change the configuration. A null default requires a nullable field.
+JSON must contain one object without duplicate keys or trailing documents. Effect fields cannot override the reserved
+`type` field. Paths must resolve exactly, without empty components. Defaults and effect literals are copied when
+configuration is created; later mutation of caller-owned collections or byte arrays does not change the configuration. A
+null default requires a nullable field.

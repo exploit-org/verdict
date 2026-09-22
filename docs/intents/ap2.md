@@ -11,15 +11,16 @@ Intent type: `ap2.mandate` (`IntentTypes.AP2_MANDATE`)
 an external component has verified a received mandate. It implements `Intent` and
 works with `PolicyEvaluator`, including approval requirements.
 
-The supported format is AP2 v0.2 at the [pinned upstream commit](https://github.com/google-agentic-commerce/AP2/tree/e1ea56db72a6385bce3e5c1112b3a56ce60acb43).
+The supported format is AP2 v0.2 at
+the [pinned upstream commit](https://github.com/google-agentic-commerce/AP2/tree/e1ea56db72a6385bce3e5c1112b3a56ce60acb43).
 The four exact `vct` values are:
 
-| `vct` | Effect |
-| --- | --- |
-| `mandate.payment.1` | `ap2.payment.authorize` |
-| `mandate.checkout.1` | `ap2.checkout.authorize` |
-| `mandate.payment.open.1` | `ap2.payment.delegate` |
-| `mandate.checkout.open.1` | `ap2.checkout.delegate` |
+| `vct`                     | Effect                   |
+|---------------------------|--------------------------|
+| `mandate.payment.1`       | `ap2.payment.authorize`  |
+| `mandate.checkout.1`      | `ap2.checkout.authorize` |
+| `mandate.payment.open.1`  | `ap2.payment.delegate`   |
+| `mandate.checkout.open.1` | `ap2.checkout.delegate`  |
 
 ## Evaluation boundary
 
@@ -82,7 +83,8 @@ var policy = Policy.denyByDefault("ap2-payment")
 var evaluation = new PolicyEvaluator().evaluate(policy, intent);
 ```
 
-Both `fromJson` and `fromCheckoutJson` accept UTF-8 `byte[]` as well as `String`.
+Both `fromJson` and `fromCheckoutJson` accept Jackson `JsonNode` objects directly.
+Overloads accept `String` or UTF-8 `byte[]` when the input has not yet been decoded.
 
 ## Closed checkout
 
@@ -110,12 +112,12 @@ exposes `checkout`. All returned maps and lists are recursively immutable.
 `effects` always has exactly one entry containing the complete mandate fields plus
 its normalized effect `type`. Authorization effects also expose:
 
-| Field | Payment | Checkout |
-| --- | --- | --- |
-| `amount` | `payment_amount.amount` | Checkout `totals` entry with `type == 'total'` |
-| `asset` | `payment_amount.currency` | Checkout `currency` |
-| `to` | `payee.id` | Checkout `merchant.id` |
-| `checkout` | Absent | Complete decoded checkout |
+| Field      | Payment                   | Checkout                                       |
+|------------|---------------------------|------------------------------------------------|
+| `amount`   | `payment_amount.amount`   | Checkout `totals` entry with `type == 'total'` |
+| `asset`    | `payment_amount.currency` | Checkout `currency`                            |
+| `to`       | `payee.id`                | Checkout `merchant.id`                         |
+| `checkout` | Absent                    | Complete decoded checkout                      |
 
 Payment amounts and checkout prices are integer ISO-4217 minor units: `19900 USD`
 means USD 199.00. Integer JSON values use `BigInteger`, including quantities and Unix
@@ -130,7 +132,9 @@ For concrete payments, require `ap2.payment.authorize` in the rule.
 
 ## Validation profile
 
-The reader rejects malformed/duplicate/trailing JSON, unsupported `vct` versions,
+The text and byte readers reject malformed JSON, duplicate keys and trailing content.
+For `JsonNode` input, configure the application's decoder as shown in
+[Java integration](payments.md#java-integration). All overloads reject unsupported `vct` versions,
 unknown mandate fields and constraint types, missing required fields, nulls in typed
 fields, negative payment amounts, fractional minor-unit amounts and unknown currency
 codes. Dates require ISO-8601 date-times with an offset; creation/expiration values

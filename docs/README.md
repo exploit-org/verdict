@@ -8,14 +8,14 @@ file, a request, and the expected result. No knowledge of CEL or the Java API is
 
 ## Choose the action you want to control
 
-| I want to… | Guide | Ready-to-edit authority |
-| --- | --- | --- |
-| Validate my own JSON request | [Typed JSON](intents/typed.md) | [Purchase](authority/examples/typed-purchase.yaml) |
-| Require human approval above a limit | [Approvals](approvals.md) | [Purchase with approval](authority/examples/typed-approvals.yaml) |
-| Control AP2 or Mastercard agent payments | [Payment policies](intents/payments.md) | [AP2](authority/examples/ap2-payment.yaml), [VI](authority/examples/mcintent-payment.yaml) |
-| Restrict an EVM token transfer | [EVM](intents/evm.md) | [Token transfer](authority/examples/evm-transfer.yaml) |
-| Restrict a Bitcoin payment and its change | [Bitcoin](intents/bitcoin.md) | [Payment with change](authority/examples/bitcoin-transfer.yaml) |
-| Check a certificate before issuance | [X.509](intents/x509.md) | [Server certificate](authority/examples/x509-server.yaml) |
+| I want to…                                | Guide                                   | Ready-to-edit authority                                                                    |
+|-------------------------------------------|-----------------------------------------|--------------------------------------------------------------------------------------------|
+| Validate my own JSON request              | [Typed JSON](intents/typed.md)          | [Purchase](authority/examples/typed-purchase.yaml)                                         |
+| Require human approval above a limit      | [Approvals](approvals.md)               | [Purchase with approval](authority/examples/typed-approvals.yaml)                          |
+| Control AP2 or Mastercard agent payments  | [Payment policies](intents/payments.md) | [AP2](authority/examples/ap2-payment.yaml), [VI](authority/examples/mcintent-payment.yaml) |
+| Restrict an EVM token transfer            | [EVM](intents/evm.md)                   | [Token transfer](authority/examples/evm-transfer.yaml)                                     |
+| Restrict a Bitcoin payment and its change | [Bitcoin](intents/bitcoin.md)           | [Payment with change](authority/examples/bitcoin-transfer.yaml)                            |
+| Check a certificate before issuance       | [X.509](intents/x509.md)                | [Server certificate](authority/examples/x509-server.yaml)                                  |
 
 ## Learn only what you need
 

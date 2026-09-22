@@ -2,12 +2,12 @@ schemaVersion: verdict.authority/v1
 id: com.acme.x509.server
 type: x509.tbs-certificate
 version: 1.0.0
-config: {}
+config: { }
 policy:
   id: server-name-and-validity
   fallback: DENY
   variables:
-    allowedDnsNames: [api.example.com]
+    allowedDnsNames: [ api.example.com ]
   allow:
     - id: named-server
       where:

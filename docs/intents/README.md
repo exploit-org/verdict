@@ -4,14 +4,14 @@ An intent module turns an actual request into the fields a policy reads. For exa
 the EVM module decodes serialized transaction bytes into `chainId`, `call` and
 `effects`. Policies read those decoded fields.
 
-| Your actual input | Use | Authority `type` | Guide |
-| --- | --- | --- | --- |
-| Unsigned EVM transaction bytes | `verdict-intent-evm` | `evm.transaction` | [Token transfer](evm.md) |
-| Unsigned Bitcoin transaction + full previous transactions | `verdict-intent-bitcoin` | `bitcoin.transaction` | [Payment and change](bitcoin.md) |
-| DER TBSCertificate body | `verdict-intent-x509` | `x509.tbs-certificate` | [Certificate policy](x509.md) |
-| Your own JSON schema | `verdict-intent-typed` | `custom` | [Typed JSON](typed.md) |
-| Complete AP2 mandate content | `verdict-ap2` | `ap2.mandate` | [Payment policy](payments.md), [adapter](ap2.md) |
-| Complete Mastercard VI mandate content | `verdict-mcintent` | `mcintent.mandate` | [Payment policy](payments.md), [adapter](mcintent.md) |
+| Your actual input                                         | Use                      | Authority `type`       | Guide                                                 |
+|-----------------------------------------------------------|--------------------------|------------------------|-------------------------------------------------------|
+| Unsigned EVM transaction bytes                            | `verdict-intent-evm`     | `evm.transaction`      | [Token transfer](evm.md)                              |
+| Unsigned Bitcoin transaction + full previous transactions | `verdict-intent-bitcoin` | `bitcoin.transaction`  | [Payment and change](bitcoin.md)                      |
+| DER TBSCertificate body                                   | `verdict-intent-x509`    | `x509.tbs-certificate` | [Certificate policy](x509.md)                         |
+| Your own JSON schema                                      | `verdict-intent-typed`   | `custom`               | [Typed JSON](typed.md)                                |
+| Complete AP2 mandate content                              | `verdict-ap2`            | `ap2.mandate`          | [Payment policy](payments.md), [adapter](ap2.md)      |
+| Complete Mastercard VI mandate content                    | `verdict-mcintent`       | `mcintent.mandate`     | [Payment policy](payments.md), [adapter](mcintent.md) |
 
 Artifacts use group `org.exploit`. Use the same version as your Verdict core.
 

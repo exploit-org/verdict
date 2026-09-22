@@ -17,12 +17,12 @@ var result = evaluator.evaluate(compiled, intent);      // once per request
 root variable names and CEL types. `intent` is built by the matching domain module
 with trusted `authority.config()`. No signing takes place in these calls.
 
-| Result | Application behavior |
-| --- | --- |
-| ALLOW | May proceed with the evaluated action |
-| DENY | Stop |
+| Result                  | Application behavior                                          |
+|-------------------------|---------------------------------------------------------------|
+| ALLOW                   | May proceed with the evaluated action                         |
+| DENY                    | Stop                                                          |
 | ALLOW_WITH_REQUIREMENTS | Satisfy every returned approval requirement before proceeding |
-| Exception | Stop and handle the invalid policy/input/evaluation |
+| Exception               | Stop and handle the invalid policy/input/evaluation           |
 
 Handle all three verdicts explicitly. See [approvals](approvals.md) for a complete example.
 
@@ -86,12 +86,12 @@ same-named context entries. Keep constants and request roots distinct.
 
 ## compile versus compileStrict
 
-| Call | Behavior |
-| --- | --- |
-| `compile(policy)` | Discovers external roots and declares them as dynamic |
-| `compile(policy, schema)` | Discovers roots and uses supplied types where available |
+| Call                            | Behavior                                                        |
+|---------------------------------|-----------------------------------------------------------------|
+| `compile(policy)`               | Discovers external roots and declares them as dynamic           |
+| `compile(policy, schema)`       | Discovers roots and uses supplied types where available         |
 | `compileStrict(policy, schema)` | Only roots in the schema and policy constants may be referenced |
-| `compileStrict(policy)` | Only policy constants may be referenced |
+| `compileStrict(policy)`         | Only policy constants may be referenced                         |
 
 Use strict compilation when the intent builder defines the input schema. A dynamic
 map root still has runtime-defined keys: `merchants.officeSop` can compile while

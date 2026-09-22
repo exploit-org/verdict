@@ -1,8 +1,6 @@
 dependencies {
     api project(':verdict-payments')
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-
     testImplementation project(':verdict-ap2')
     testImplementation project(':verdict-authority')
 }

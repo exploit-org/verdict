@@ -63,16 +63,16 @@ Read it in three parts:
 
 Keep the recipient `office-shop` and currency USD unless the row says otherwise.
 
-| Request | Result | Why |
-| --- | --- | --- |
-| 49.99, not urgent | ALLOW | All conditions pass |
-| 100.00, not urgent | ALLOW | The upper bound is inclusive |
-| 100.01 | DENY | Over the limit |
-| 0 | DENY | Must be greater than zero |
-| 49.99 EUR | DENY | Wrong currency |
-| 49.99 to another recipient | DENY | Wrong recipient |
-| 49.99, urgent | DENY | A deny rule wins |
-| Missing `amount` | Input error | Required input is missing |
+| Request                    | Result      | Why                          |
+|----------------------------|-------------|------------------------------|
+| 49.99, not urgent          | ALLOW       | All conditions pass          |
+| 100.00, not urgent         | ALLOW       | The upper bound is inclusive |
+| 100.01                     | DENY        | Over the limit               |
+| 0                          | DENY        | Must be greater than zero    |
+| 49.99 EUR                  | DENY        | Wrong currency               |
+| 49.99 to another recipient | DENY        | Wrong recipient              |
+| 49.99, urgent              | DENY        | A deny rule wins             |
+| Missing `amount`           | Input error | Required input is missing    |
 
 Input, compilation and evaluation errors stop signing.
 

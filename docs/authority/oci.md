@@ -47,13 +47,13 @@ The artifact contains one supported authority document: `authority.json`,
 `authority.yaml`, or `authority.yml`. The descriptor digest must match the requested
 digest, and the document's `id` must match the registered authority ID.
 
-| Failure | Check |
-| --- | --- |
-| Reference rejected | Use `oci://`, repository path, and a full SHA-256 digest; omit tags |
-| Pull/authentication failure | Registry reachability and client credentials |
-| Authority ID mismatch | The YAML `id` and application registration must agree |
-| Document parse failure | One supported document, valid schema, no duplicate keys |
-| Policy compile failure | CEL fields/functions and the evaluator's registered libraries |
+| Failure                     | Check                                                               |
+|-----------------------------|---------------------------------------------------------------------|
+| Reference rejected          | Use `oci://`, repository path, and a full SHA-256 digest; omit tags |
+| Pull/authentication failure | Registry reachability and client credentials                        |
+| Authority ID mismatch       | The YAML `id` and application registration must agree               |
+| Document parse failure      | One supported document, valid schema, no duplicate keys             |
+| Policy compile failure      | CEL fields/functions and the evaluator's registered libraries       |
 
 The loader retrieves and validates the authority artifact. The application evaluates
 requests, collects approvals and signs authorized content.

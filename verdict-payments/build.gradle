@@ -1,3 +1,4 @@
 dependencies {
     api project(':')
+    api 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
 }

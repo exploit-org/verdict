@@ -1,4 +1,5 @@
 ![](assets/verdict-banner.png)
+
 # Verdict
 
 Verdict checks whether an action may be signed or issued. Write the conditions in
@@ -13,18 +14,18 @@ For other actions, [choose an intent guide](docs/intents/README.md).
 
 ## Modules
 
-| Artifact | Purpose |
-| --- | --- |
-| `org.exploit:verdict` | Core policy model, builder, compiler, evaluator, and CEL functions. |
-| `org.exploit:verdict-intent-x509` | RFC 5280 `TBSCertificate` intent for pre-issuance checks. |
-| `org.exploit:verdict-intent-evm` | Unsigned EVM transaction intent with ABI/effect mapping. |
-| `org.exploit:verdict-intent-bitcoin` | Unsigned Bitcoin UTXO transaction intent. |
-| `org.exploit:verdict-intent-typed` | Declarative JSON typed intent for custom request shapes. |
-| `org.exploit:verdict-ap2` | AP2 v0.2 mandate content evaluation, without cryptography. |
-| `org.exploit:verdict-mcintent` | Mastercard Verifiable Intent v0.1 draft mandate content evaluation. |
-| `org.exploit:verdict-payments` | Shared merchant/method config, action policy functions, and whole-request evaluation for AP2 and VI. |
-| `org.exploit:verdict-authority` | Authority document parser, loader, compiler, and registry. |
-| `org.exploit:verdict-authority-oci` | Digest-pinned OCI authority loading. |
+| Artifact                             | Purpose                                                                                              |
+|--------------------------------------|------------------------------------------------------------------------------------------------------|
+| `org.exploit:verdict`                | Core policy model, builder, compiler, evaluator, and CEL functions.                                  |
+| `org.exploit:verdict-intent-x509`    | RFC 5280 `TBSCertificate` intent for pre-issuance checks.                                            |
+| `org.exploit:verdict-intent-evm`     | Unsigned EVM transaction intent with ABI/effect mapping.                                             |
+| `org.exploit:verdict-intent-bitcoin` | Unsigned Bitcoin UTXO transaction intent.                                                            |
+| `org.exploit:verdict-intent-typed`   | Declarative JSON typed intent for custom request shapes.                                             |
+| `org.exploit:verdict-ap2`            | AP2 v0.2 mandate content evaluation, without cryptography.                                           |
+| `org.exploit:verdict-mcintent`       | Mastercard Verifiable Intent v0.1 draft mandate content evaluation.                                  |
+| `org.exploit:verdict-payments`       | Shared merchant/method config, action policy functions, and whole-request evaluation for AP2 and VI. |
+| `org.exploit:verdict-authority`      | Authority document parser, loader, compiler, and registry.                                           |
+| `org.exploit:verdict-authority-oci`  | Digest-pinned OCI authority loading.                                                                 |
 
 ## Documentation
 

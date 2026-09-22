@@ -57,15 +57,15 @@ An empty `where` matches unconditionally. Remove unused placeholder rules.
 
 ## Read fields and check optional values
 
-| Need | Expression | Meaning |
-| --- | --- | --- |
-| Equality | `currency == 'USD'` | Exact string match; case matters |
-| Inequality | `recipient != 'blocked-shop'` | Different string |
-| Boolean | `urgent` or `!urgent` | True or false |
-| Nested field | `customer.country == 'DE'` | Field in an object |
-| Key with punctuation | `labels['cost-center'] == 'office'` | Bracket access |
-| Optional key | `has(customer.country) && customer.country == 'DE'` | Missing nested key makes this false |
-| Nullable field | `customer.country != null && customer.country == 'DE'` | Field exists but may be null |
+| Need                 | Expression                                             | Meaning                             |
+|----------------------|--------------------------------------------------------|-------------------------------------|
+| Equality             | `currency == 'USD'`                                    | Exact string match; case matters    |
+| Inequality           | `recipient != 'blocked-shop'`                          | Different string                    |
+| Boolean              | `urgent` or `!urgent`                                  | True or false                       |
+| Nested field         | `customer.country == 'DE'`                             | Field in an object                  |
+| Key with punctuation | `labels['cost-center'] == 'office'`                    | Bracket access                      |
+| Optional key         | `has(customer.country) && customer.country == 'DE'`    | Missing nested key makes this false |
+| Nullable field       | `customer.country != null && customer.country == 'DE'` | Field exists but may be null        |
 
 Declare the root object in the intent schema before using `has()` on its fields.
 Typed JSON optional fields without defaults exist as `null`; native modules can omit
@@ -95,12 +95,12 @@ for nested collections such as cart items.
 
 ## Amounts: choose the correct unit and helper
 
-| Data | Example limit | Comparison |
-| --- | --- | --- |
-| Your decimal field in dollars | `"100.00"` | `decimal.lte(amount, '100.00')` |
-| EVM token base units | `"1000000"` | `bigint.lte(tokenAmount, '1000000')` |
-| Bitcoin satoshis | `"1000"` | `bigint.lte(fee, '1000')` |
-| AP2/VI concrete payment | `"100.00"` USD | `payment.amountAtMost('100.00', 'USD')` |
+| Data                          | Example limit  | Comparison                              |
+|-------------------------------|----------------|-----------------------------------------|
+| Your decimal field in dollars | `"100.00"`     | `decimal.lte(amount, '100.00')`         |
+| EVM token base units          | `"1000000"`    | `bigint.lte(tokenAmount, '1000000')`    |
+| Bitcoin satoshis              | `"1000"`       | `bigint.lte(fee, '1000')`               |
+| AP2/VI concrete payment       | `"100.00"` USD | `payment.amountAtMost('100.00', 'USD')` |
 
 A token with six decimal places has 1,000,000 base units per token. Set limits using
 the token's known decimals. Bitcoin has 100,000,000 satoshis per BTC. Payment helpers convert
