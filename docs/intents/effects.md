@@ -59,6 +59,9 @@ The integer sum helpers are unsuitable for custom effects whose amounts are frac
 |------------------------|------------------------------------------------------------------------------------------------------|--------------------------------------------------|
 | EVM                    | `native.transfer`, `erc20.transfer`, `erc20.approval`, `erc20.transferFrom`, configured custom types | Wei or token base units, depending on type       |
 | Bitcoin                | `utxo.spend`, `utxo.output`, `utxo.data`, `utxo.fee`                                                 | Satoshis for amounts                             |
+| TRON                   | `native.transfer`, `trc20.transfer`, `trc20.approval`, `trc20.transferFrom`                            | Sun for TRX, token base units for TRC20          |
+| Solana                 | `native.transfer`, `spl.transfer`, `spl.ata.create`                                                   | Lamports for SOL, token base units for SPL       |
+| XRP                    | `native.transfer`                                                                                    | Drops for XRP                                    |
 | Typed JSON             | Your configured types                                                                                | Your schema's chosen units                       |
 | AP2 raw single mandate | `ap2.payment.authorize`, `ap2.checkout.authorize`, `ap2.payment.delegate`, `ap2.checkout.delegate`   | Concrete amounts in currency minor units         |
 | VI raw single mandate  | Same suffixes with `mcintent.` prefix                                                                | Concrete payment amounts in currency minor units |

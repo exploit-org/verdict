@@ -88,8 +88,8 @@ Input, compilation and evaluation errors stop signing.
 
 ## 5. Run it from Java
 
-Add `org.exploit:verdict-authority` and `org.exploit:verdict-intent-typed` at the same
-version as your Verdict core. The intent modules include core as a transitive dependency.
+Add `org.exploit.verdict:authority` and `org.exploit.verdict:typed` at the same
+version. Both include `core` as a transitive dependency.
 
 ```java
 import java.nio.file.Path;

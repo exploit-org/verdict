@@ -3,7 +3,7 @@
 For YAML examples, see [payment policies](payments.md). For request construction,
 see the [Java example](payments.md#java-integration).
 
-Artifact: `org.exploit:verdict-ap2`
+Artifact: `org.exploit.verdict:ap2`
 
 Intent type: `ap2.mandate` (`IntentTypes.AP2_MANDATE`)
 
@@ -153,5 +153,5 @@ The policy evaluates whether the combined constraints grant acceptable authority
 ## Tests
 
 ```bash
-./gradlew :verdict-ap2:test
+./gradlew :agentic-payments:verdict-ap2:test
 ```

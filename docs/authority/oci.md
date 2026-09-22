@@ -1,6 +1,6 @@
 # Load an authority from an OCI registry
 
-Artifact: `org.exploit:verdict-authority-oci`.
+Artifact: `org.exploit.verdict:authority-oci`.
 
 Use OCI loading when your application receives versioned authority files from a
 registry. The policy YAML format stays the same. Write and

@@ -14,18 +14,20 @@ For other actions, [choose an intent guide](docs/intents/README.md).
 
 ## Modules
 
-| Artifact                             | Purpose                                                                                              |
-|--------------------------------------|------------------------------------------------------------------------------------------------------|
-| `org.exploit:verdict`                | Core policy model, builder, compiler, evaluator, and CEL functions.                                  |
-| `org.exploit:verdict-intent-x509`    | RFC 5280 `TBSCertificate` intent for pre-issuance checks.                                            |
-| `org.exploit:verdict-intent-evm`     | Unsigned EVM transaction intent with ABI/effect mapping.                                             |
-| `org.exploit:verdict-intent-bitcoin` | Unsigned Bitcoin UTXO transaction intent.                                                            |
-| `org.exploit:verdict-intent-typed`   | Declarative JSON typed intent for custom request shapes.                                             |
-| `org.exploit:verdict-ap2`            | AP2 v0.2 mandate content evaluation, without cryptography.                                           |
-| `org.exploit:verdict-mcintent`       | Mastercard Verifiable Intent v0.1 draft mandate content evaluation.                                  |
-| `org.exploit:verdict-payments`       | Shared merchant/method config, action policy functions, and whole-request evaluation for AP2 and VI. |
-| `org.exploit:verdict-authority`      | Authority document parser, loader, compiler, and registry.                                           |
-| `org.exploit:verdict-authority-oci`  | Digest-pinned OCI authority loading.                                                                 |
+All artifacts use group `org.exploit.verdict`.
+
+| Artifact | Purpose |
+|----------|---------|
+| `core` | Policy compiler and evaluator. |
+| `digital-assets` | EVM, Bitcoin, TRON, Solana, and XRP modules. |
+| `evm`, `bitcoin`, `tron`, `solana`, `xrp` | Individual digital asset modules. |
+| `agentic-payments` | AP2 and Mastercard VI modules. |
+| `ap2`, `mc-vi` | Individual agent payment modules. |
+| `payments` | Shared AP2 and VI policy functions. |
+| `typed` | Custom JSON intents. |
+| `x509` | Certificate issuance intents. |
+| `authority` | Authority document parser and compiler. |
+| `authority-oci` | OCI authority loader. |
 
 ## Documentation
 

@@ -85,7 +85,7 @@ be spent. The fee limit is an absolute amount in satoshis.
 
 ## API, input requirements and field reference
 
-Artifact: `org.exploit:verdict-intent-bitcoin`.
+Artifact: `org.exploit.verdict:bitcoin`.
 
 Intent type: `bitcoin.transaction`.
 

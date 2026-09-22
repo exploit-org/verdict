@@ -1,9 +1,9 @@
 # Built-In CEL Functions
 
-These functions are installed by the core `org.exploit:verdict` module.
+These functions are installed by `org.exploit.verdict:core`.
 
 AP2 and Mastercard VI provide opt-in [payment receiver functions](intents/payments.md)
-through `verdict-payments`: `payment.payeeIs(...)`, `payment.methodIs(...)`,
+through `org.exploit.verdict:payments`: `payment.payeeIs(...)`, `payment.methodIs(...)`,
 `payment.amountAtMost(...)`, `checkout.merchantIs(...)`, `request.totalAtMost(...)`
 and separate `delegation.*` checks. Register `PaymentFunctions` through
 `PolicyEvaluator.builder().library(functions, functions)`;

@@ -63,7 +63,7 @@ manage Verdict dependencies separately.
 
 ## Load and evaluate locally
 
-Artifact: `org.exploit:verdict-authority`. JSON and YAML are supported.
+Artifact: `org.exploit.verdict:authority`. JSON and YAML are supported.
 
 ```java
 var authority = new AuthorityParser().parse(Path.of("authority.yaml"));

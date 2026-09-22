@@ -15,6 +15,9 @@ file, a request, and the expected result. No knowledge of CEL or the Java API is
 | Control AP2 or Mastercard agent payments  | [Payment policies](intents/payments.md) | [AP2](authority/examples/ap2-payment.yaml), [VI](authority/examples/mcintent-payment.yaml) |
 | Restrict an EVM token transfer            | [EVM](intents/evm.md)                   | [Token transfer](authority/examples/evm-transfer.yaml)                                     |
 | Restrict a Bitcoin payment and its change | [Bitcoin](intents/bitcoin.md)           | [Payment with change](authority/examples/bitcoin-transfer.yaml)                            |
+| Restrict a TRON transfer                  | [TRON](intents/tron.md)                 | [TRC20 transfer](authority/examples/tron-transfer.yaml)                                    |
+| Restrict a Solana transfer                | [Solana](intents/solana.md)             | [SOL transfer](authority/examples/solana-transfer.yaml)                                    |
+| Restrict an XRP payment                   | [XRP](intents/xrp.md)                   | [XRP payment](authority/examples/xrp-payment.yaml)                                         |
 | Check a certificate before issuance       | [X.509](intents/x509.md)                | [Server certificate](authority/examples/x509-server.yaml)                                  |
 
 ## Learn only what you need

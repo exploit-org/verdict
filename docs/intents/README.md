@@ -4,16 +4,20 @@ An intent module turns an actual request into the fields a policy reads. For exa
 the EVM module decodes serialized transaction bytes into `chainId`, `call` and
 `effects`. Policies read those decoded fields.
 
-| Your actual input                                         | Use                      | Authority `type`       | Guide                                                 |
-|-----------------------------------------------------------|--------------------------|------------------------|-------------------------------------------------------|
-| Unsigned EVM transaction bytes                            | `verdict-intent-evm`     | `evm.transaction`      | [Token transfer](evm.md)                              |
-| Unsigned Bitcoin transaction + full previous transactions | `verdict-intent-bitcoin` | `bitcoin.transaction`  | [Payment and change](bitcoin.md)                      |
-| DER TBSCertificate body                                   | `verdict-intent-x509`    | `x509.tbs-certificate` | [Certificate policy](x509.md)                         |
-| Your own JSON schema                                      | `verdict-intent-typed`   | `custom`               | [Typed JSON](typed.md)                                |
-| Complete AP2 mandate content                              | `verdict-ap2`            | `ap2.mandate`          | [Payment policy](payments.md), [adapter](ap2.md)      |
-| Complete Mastercard VI mandate content                    | `verdict-mcintent`       | `mcintent.mandate`     | [Payment policy](payments.md), [adapter](mcintent.md) |
+| Your input | Artifact | Authority `type` | Guide |
+|------------|----------|------------------|-------|
+| Unsigned EVM transaction | `evm` | `evm.transaction` | [EVM](evm.md) |
+| Unsigned Bitcoin transaction and previous transactions | `bitcoin` | `bitcoin.transaction` | [Bitcoin](bitcoin.md) |
+| Unsigned TRON transaction | `tron` | `tron.transaction` | [TRON](tron.md) |
+| Unsigned Solana transaction | `solana` | `solana.transaction` | [Solana](solana.md) |
+| Unsigned XRP Payment or atomic Batch | `xrp` | `xrp.transaction` | [XRP](xrp.md) |
+| DER TBSCertificate body | `x509` | `x509.tbs-certificate` | [X.509](x509.md) |
+| Custom JSON | `typed` | `custom` | [Typed JSON](typed.md) |
+| AP2 mandate content | `ap2` | `ap2.mandate` | [AP2](ap2.md) |
+| Mastercard VI mandate content | `mc-vi` | `mcintent.mandate` | [VI](mcintent.md) |
 
-Artifacts use group `org.exploit`. Use the same version as your Verdict core.
+Artifacts use group `org.exploit.verdict`. `digital-assets` includes the five chain
+modules; `agentic-payments` includes AP2 and VI. Use one Verdict version throughout.
 
 ## What becomes available to CEL?
 

@@ -1,6 +1,6 @@
 # Core engine: integrate a policy evaluator
 
-Artifact: `org.exploit:verdict`. Java 25+.
+Artifact: `org.exploit.verdict:core`. Java 25+.
 
 If you are writing YAML, start with [your first policy](getting-started.md).
 This page explains the Java calls your application makes and their exact behavior.

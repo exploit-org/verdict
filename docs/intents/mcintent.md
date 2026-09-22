@@ -3,7 +3,7 @@
 For YAML examples, see [payment policies](payments.md). For request construction,
 see the [Java example](payments.md#java-integration).
 
-Artifact: `org.exploit:verdict-mcintent`
+Artifact: `org.exploit.verdict:mc-vi`
 
 Intent type: `mcintent.mandate` (`IntentTypes.MCINTENT_MANDATE`)
 
@@ -166,5 +166,5 @@ as caller-supplied data. Authenticate their source before relying on them.
 ## Tests
 
 ```bash
-./gradlew :verdict-mcintent:test
+./gradlew :agentic-payments:verdict-mc-vi:test
 ```

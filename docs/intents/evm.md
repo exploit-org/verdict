@@ -91,7 +91,7 @@ transaction type; guard nullable fields or constrain `type` before using them.
 
 ## API, custom contracts and available fields
 
-Artifact: `org.exploit:verdict-intent-evm`.
+Artifact: `org.exploit.verdict:evm`.
 
 Intent type: `evm.transaction`.
 

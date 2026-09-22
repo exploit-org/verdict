@@ -119,7 +119,7 @@ the signed action, or use the native decoder for its format.
 
 ## Config and API reference
 
-Artifact: `org.exploit:verdict-intent-typed`.
+Artifact: `org.exploit.verdict:typed`.
 
 Intent type: `custom`.
 
