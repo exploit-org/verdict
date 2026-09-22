@@ -1,0 +1,25 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.xrp.payment
+type: xrp.transaction
+version: 1.0.0
+config: { }
+policy:
+  id: tagged-xrp-payment
+  fallback: DENY
+  variables:
+    accountAddress: "rU6K7V3Po4snVhBBaU29sesqs2qTQJWDw1"
+    recipientAddress: "rHb9CJAWyB4rj91VRWn96DkukG4bwdtyTh"
+    maxDrops: "1000000"
+    maxFeeDrops: "12"
+  allow:
+    - id: approved-payment
+      where:
+        - "type == 'payment'"
+        - "account == accountAddress"
+        - "lastLedgerSequence != null"
+        - "bigint.lte(fee, maxFeeDrops)"
+        - "effect.onlyTypes(effects, ['native.transfer'])"
+        - "effect.one(effects, 'native.transfer')"
+        - "effect.all(effects, 'native.transfer', {'asset': 'xrp', 'to': recipientAddress, 'destinationTag': 0})"
+        - "bigint.gt(effect.amount(effects, 'native.transfer'), '0')"
+        - "bigint.lte(effect.amount(effects, 'native.transfer'), maxDrops)"
