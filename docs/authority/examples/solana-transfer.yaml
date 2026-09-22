@@ -1,0 +1,22 @@
+schemaVersion: verdict.authority/v1
+id: com.acme.solana.transfer
+type: solana.transaction
+version: 1.0.0
+config: { }
+policy:
+  id: one-sol-transfer
+  fallback: DENY
+  variables:
+    recipientAddress: "9hSR6S7WPtxmTojgo6GG3k4yDPecgJY292j7xrsUGWBu"
+    maxLamports: "1000000000"
+  allow:
+    - id: approved-transfer
+      where:
+        - "requiredSignatures == 1"
+        - "computeUnitLimit <= 200000"
+        - "bigint.lte(computeUnitPrice, '5000')"
+        - "effect.onlyTypes(effects, ['native.transfer'])"
+        - "effect.one(effects, 'native.transfer')"
+        - "effect.all(effects, 'native.transfer', {'asset': 'sol', 'to': recipientAddress})"
+        - "bigint.gt(effect.amount(effects, 'native.transfer'), '0')"
+        - "bigint.lte(effect.amount(effects, 'native.transfer'), maxLamports)"
