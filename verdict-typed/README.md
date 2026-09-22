@@ -1,4 +1,4 @@
-# verdict-intent-typed
+# verdict-typed
 
 Write a policy for your own JSON with an authority YAML policy.
 

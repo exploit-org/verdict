@@ -1,0 +1,4 @@
+dependencies {
+    api project(':agentic-payments:verdict-ap2')
+    api project(':agentic-payments:verdict-mc-vi')
+}

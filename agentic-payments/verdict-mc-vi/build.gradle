@@ -1,7 +1,7 @@
 dependencies {
-    api project(':verdict-payments')
+    api project(':agentic-payments:verdict-payments')
 
-    testImplementation project(':verdict-ap2')
+    testImplementation project(':agentic-payments:verdict-ap2')
     testImplementation project(':verdict-authority')
 }
 

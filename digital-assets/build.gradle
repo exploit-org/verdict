@@ -1,0 +1,7 @@
+dependencies {
+    api project(':digital-assets:verdict-evm')
+    api project(':digital-assets:verdict-bitcoin')
+    api project(':digital-assets:verdict-tron')
+    api project(':digital-assets:verdict-solana')
+    api project(':digital-assets:verdict-xrp')
+}

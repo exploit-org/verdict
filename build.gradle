@@ -6,7 +6,7 @@ plugins {
     id 'tech.yanand.maven-central-publish' version '1.2.0'
 }
 
-group = 'org.exploit'
+group = 'org.exploit.verdict'
 version = findProperty('releaseVersion') ?: '0.2.0'
 
 def centralMavenToken = findProperty('centralMavenToken')
@@ -66,28 +66,38 @@ def snapshotRepositoryPassword = firstPropertyOrEnv(
 def centralBundleRepo = layout.buildDirectory.dir('repos/central-bundles')
 def publishableProjects = [
         project(':'),
-        project(':verdict-intent-x509'),
-        project(':verdict-intent-evm'),
-        project(':verdict-intent-bitcoin'),
-        project(':verdict-intent-typed'),
-        project(':verdict-ap2'),
-        project(':verdict-mcintent'),
-        project(':verdict-payments'),
+        project(':verdict-x509'),
+        project(':verdict-typed'),
+        project(':digital-assets'),
+        project(':digital-assets:verdict-evm'),
+        project(':digital-assets:verdict-bitcoin'),
+        project(':digital-assets:verdict-tron'),
+        project(':digital-assets:verdict-solana'),
+        project(':digital-assets:verdict-xrp'),
+        project(':agentic-payments'),
+        project(':agentic-payments:verdict-payments'),
+        project(':agentic-payments:verdict-ap2'),
+        project(':agentic-payments:verdict-mc-vi'),
         project(':verdict-authority'),
         project(':verdict-authority-oci')
 ]
 
 def pomDescriptions = [
-        ':'                      : 'Verdict policy engine core.',
-        ':verdict-intent-x509'   : 'Verdict intent module for RFC 5280 TBSCertificate pre-issuance checks.',
-        ':verdict-intent-evm'    : 'Verdict intent module for unsigned EVM transactions and effects.',
-        ':verdict-intent-bitcoin': 'Verdict intent module for unsigned Bitcoin transactions.',
-        ':verdict-intent-typed'  : 'Verdict intent module for declarative custom JSON typed intents.',
-        ':verdict-ap2'           : 'Verdict evaluation of AP2 mandate content.',
-        ':verdict-mcintent'      : 'Verdict evaluation of Mastercard Verifiable Intent mandate content.',
-        ':verdict-payments'      : 'Shared payment configuration and user-facing CEL policy helpers.',
-        ':verdict-authority'     : 'Verdict authority policy bundle model, parser, compiler, and registry.',
-        ':verdict-authority-oci' : 'Verdict authority loader for digest-pinned OCI artifacts.'
+        ':'                                      : 'Policy evaluation core.',
+        ':verdict-x509'                          : 'X.509 certificate intents.',
+        ':verdict-typed'                         : 'Custom JSON intents.',
+        ':digital-assets'                        : 'Digital asset intent modules.',
+        ':digital-assets:verdict-evm'            : 'EVM transaction intents.',
+        ':digital-assets:verdict-bitcoin'        : 'Bitcoin transaction intents.',
+        ':digital-assets:verdict-tron'           : 'TRON transaction intents.',
+        ':digital-assets:verdict-solana'         : 'Solana transaction intents.',
+        ':digital-assets:verdict-xrp'            : 'XRP transaction intents.',
+        ':agentic-payments'                      : 'AP2 and Mastercard VI payment intents.',
+        ':agentic-payments:verdict-payments'     : 'Shared payment policy functions.',
+        ':agentic-payments:verdict-ap2'          : 'AP2 mandate intents.',
+        ':agentic-payments:verdict-mc-vi'        : 'Mastercard Verifiable Intent mandates.',
+        ':verdict-authority'                     : 'Authority document parser and compiler.',
+        ':verdict-authority-oci'                 : 'OCI authority loader.'
 ]
 
 def projectUrlValue = findProperty('projectUrl') ?: 'https://github.com/exploit-org/verdict'
@@ -180,12 +190,13 @@ configure(publishableProjects) {
         publications {
             maven(MavenPublication) {
                 groupId = rootProject.group
-                artifactId = project == rootProject ? rootProject.name : project.name
+                artifactId = project == rootProject ? 'core'
+                        : project.name.startsWith('verdict-') ? project.name.substring('verdict-'.length()) : project.name
 
                 from components.java
 
                 pom {
-                    name = project == rootProject ? rootProject.name : project.name
+                    name = artifactId
                     description = pomDescriptions[project.path]
                     url = projectUrlValue
 

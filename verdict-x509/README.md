@@ -1,4 +1,4 @@
-# verdict-intent-x509
+# verdict-x509
 
 Check names and validity before issuing a certificate with an authority YAML policy.
 
