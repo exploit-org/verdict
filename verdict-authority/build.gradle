@@ -1,8 +1,8 @@
 dependencies {
     api project(':')
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.2'
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml'
 
     testImplementation project(':verdict-typed')
     testImplementation project(':agentic-payments:verdict-payments')
