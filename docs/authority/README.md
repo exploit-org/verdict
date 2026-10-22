@@ -51,7 +51,7 @@ checks, use the complete purchase example above.
 | `policy.variables` | CEL evaluation                 | Constants you reference by name in conditions                 |
 | `policy.allow`     | Policy evaluation              | Alternative permitted cases                                   |
 | `policy.deny`      | Policy evaluation              | Conditions that forbid the action even if an allow matched    |
-| `policy.approvers` | Approval requirements          | Named approver keys; see [approvals](../approvals.md)         |
+| `policy.approvers` | Approval requirements          | Named typed approvers; see [approvals](../approvals.md)      |
 
 Config defines decoding and identity lookup. Policy rules authorize actions.
 An EVM contract entry enables decoding its calls; a payment shop entry defines an

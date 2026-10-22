@@ -24,6 +24,7 @@ policy:
     officeRecipient: office-shop
   approvers:
     manager:
+      id: manager
       algorithm: ED25519
       # Demonstration public key. Replace with your manager's public key.
       publicKey64: "11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo="
@@ -51,8 +52,71 @@ policy:
 
 `threshold: 1` means one of the listed approvers. For two of three, define three
 named approvers under `policy.approvers`, list those names in the rule and set
-`threshold: 2`. Names must reference distinct configured keys. Replace the example
-public key with your real approver's key.
+`threshold: 2`. Each approver must have a nonblank, unique `id`. Public-key approvers
+must also use distinct configured keys. Replace the example public key with your
+real approver's key.
+
+## Application-defined approvers
+
+`Approver` is an open interface with `id()` and `metadata()`. `PublicKeyApprover`
+contains the inline algorithm and public key. Applications can implement their own
+approvers to reference information in their storage:
+
+```java
+public record StorageApprover(
+        String id,
+        String ref,
+        Map<String, String> metadata
+) implements Approver {
+    public StorageApprover {
+        metadata = metadata == null ? Map.of() : Map.copyOf(metadata);
+    }
+}
+
+public final class AppApproverTypes implements ApproverTypeProvider {
+    @Override
+    public Collection<Class<? extends Approver>> types() {
+        return List.of(StorageApprover.class);
+    }
+}
+
+var parser = new AuthorityParser(new AppApproverTypes());
+var authority = parser.parse(content);
+```
+
+`ApproverTypeProvider` is in `org.exploit.verdict.authority.provider`. The parser
+registers `PublicKeyApprover` automatically and adds the classes returned by the
+provider for both JSON and YAML. A lambda also works:
+
+```java
+var parser = new AuthorityParser(() -> List.of(StorageApprover.class));
+```
+
+Approver types are deduced from their field names, so no `type` field or Jackson
+annotations are needed on application-defined records:
+
+```yaml
+approvers:
+  manager:
+    id: manager
+    ref: users/manager
+    metadata:
+      team: treasury
+```
+
+Deduction uses property names, not their values or nested metadata. Each document
+must contain enough fields to identify one registered type: for example `ref` for
+storage references, or `algorithm` and `publicKey64` for inline keys. Documents
+containing only shared fields such as `id` and `metadata` are ambiguous when several
+types match. Ambiguous documents, unknown fields and types with identical property
+sets are rejected.
+
+For a separate Jackson `ObjectMapper`, register the same classes with
+`mapper.registerSubtypes(PublicKeyApprover.class, StorageApprover.class)`.
+
+Verdict preserves custom approvers in compiled policies and returned requirements.
+The application resolves their references and verifies approvals. Use the same
+stable ID for the same approver identity, so aliases cannot inflate a threshold.
 
 ## What the signing integration does
 

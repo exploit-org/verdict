@@ -14,6 +14,7 @@ policy:
     officeRecipient: office-shop
   approvers:
     manager:
+      id: manager
       algorithm: ED25519
       # Demonstration public key. Replace with your manager's public key.
       publicKey64: "11qYAYKxCrfVS/7TyWQHOg7hcvPapiMlrwIaaPcHURo="

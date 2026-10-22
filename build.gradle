@@ -7,7 +7,7 @@ plugins {
 }
 
 group = 'org.exploit.verdict'
-version = findProperty('releaseVersion') ?: '0.2.1'
+version = findProperty('releaseVersion') ?: '0.3.0'
 
 def centralMavenToken = findProperty('centralMavenToken')
 def signingKey = findProperty('signingKey')
@@ -265,6 +265,7 @@ configure(publishableProjects) {
 }
 
 dependencies {
+    api 'com.fasterxml.jackson.core:jackson-annotations:2.18.2'
     api 'dev.cel:cel:0.14.0'
     constraints {
         add('implementation', 'com.google.protobuf:protobuf-java:4.36.0')
