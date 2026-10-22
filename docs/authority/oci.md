@@ -47,6 +47,27 @@ The artifact contains one supported authority document: `authority.json`,
 `authority.yaml`, or `authority.yml`. The descriptor digest must match the requested
 digest, and the document's `id` must match the registered authority ID.
 
+The artifact's layers must contain raw document bytes. The loader verifies manifest
+and payload SHA-256 digests. The default response limit is 2 MiB.
+
+`OrasOciArtifactClient.defaults()` uses anonymous HTTPS requests;
+`basicAuth(username, password)` supplies explicit credentials. For a local HTTP
+registry use `insecure()`. For a separate token service, trusted blob storage or
+custom limits, supply a client factory:
+
+```java
+var client = new OrasOciArtifactClient(registry -> OrasClient.builder("https://" + registry)
+        .basicAuth(username, password)
+        .tokenOrigin("https://auth.acme.io")
+        .downloadOrigin("https://storage.acme.io")
+        .maxResponseBytes(4 * 1024 * 1024)
+        .build());
+```
+
+`OrasClient` is in `org.exploit.verdict.oras`. The factory must return a fresh client
+for the requested registry; the loader closes it after each pull.
+See the [ORAS client reference](../../verdict-oras/README.md) for publication and tag APIs.
+
 | Failure                     | Check                                                               |
 |-----------------------------|---------------------------------------------------------------------|
 | Reference rejected          | Use `oci://`, repository path, and a full SHA-256 digest; omit tags |

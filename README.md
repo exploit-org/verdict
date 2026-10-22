@@ -28,6 +28,7 @@ All artifacts use group `org.exploit.verdict`.
 | `x509` | Certificate issuance intents. |
 | `authority` | Authority document parser and compiler. |
 | `authority-oci` | OCI authority loader. |
+| `oras` | OCI artifact client: pull, publish and list tags. |
 
 ## Documentation
 

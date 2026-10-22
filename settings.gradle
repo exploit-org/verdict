@@ -4,6 +4,7 @@ include 'verdict-x509'
 include 'verdict-typed'
 include 'verdict-authority'
 include 'verdict-authority-oci'
+include 'verdict-oras'
 
 include 'digital-assets'
 include 'digital-assets:verdict-evm'

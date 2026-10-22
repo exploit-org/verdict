@@ -79,6 +79,7 @@ def publishableProjects = [
         project(':agentic-payments:verdict-ap2'),
         project(':agentic-payments:verdict-mc-vi'),
         project(':verdict-authority'),
+        project(':verdict-oras'),
         project(':verdict-authority-oci')
 ]
 
@@ -97,6 +98,7 @@ def pomDescriptions = [
         ':agentic-payments:verdict-ap2'          : 'AP2 mandate intents.',
         ':agentic-payments:verdict-mc-vi'        : 'Mastercard Verifiable Intent mandates.',
         ':verdict-authority'                     : 'Authority document parser and compiler.',
+        ':verdict-oras'                          : 'OCI artifact registry client.',
         ':verdict-authority-oci'                 : 'OCI authority loader.'
 ]
 

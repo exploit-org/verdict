@@ -1,5 +1,6 @@
 dependencies {
     api project(':verdict-authority')
+    api project(':verdict-oras')
 
-    implementation 'land.oras:oras-java-sdk:0.6.0'
+    testImplementation testFixtures(project(':verdict-oras'))
 }
